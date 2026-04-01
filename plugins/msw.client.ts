@@ -34,12 +34,13 @@ const mswPlugin: Plugin = async (context) => {
 
     // 避免 SSR 端執行
     if (typeof window === 'undefined') return
-
     try {
         // 動態載入，確保 tree-shaking 在 production 生效
         const {worker} = await import('~/mocks/browser')
 
-        await worker.start({
+        console.log(worker)
+
+        worker.start({
             // Service Worker 路徑（相對於 Nuxt 2 的 static/ 目錄）
             serviceWorker: {
                 url: '/mockServiceWorker.js',

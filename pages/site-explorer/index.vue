@@ -17,10 +17,16 @@
       </CommonCard>
     </div>
     <el-tabs v-model="activeTab">
-      <el-tab-pane v-for="[tabName, tabItem] in tabConfigEntries" :label="tabItem.label" :name="tabName"
+      <el-tab-pane
+          v-for="[tabName, tabItem] in tabConfigEntries"
+          :key="tabName"
+          :label="tabItem.label"
+          :name="tabName"
       >
         <div class="flex gap-2">
-          <el-select v-for="selector in tabItem?.selectors" v-model="queryObject[tabName][selector.param]"
+          <el-select v-for="selector in tabItem?.selectors"
+                     :key="selector.param"
+                     v-model="queryObject[tabName][selector.param]"
                      :placeholder="selector.label"
                      clearable>
             <el-option

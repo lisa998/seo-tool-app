@@ -19,7 +19,10 @@ module.exports = {
                 surface: tokens.surface,
                 'surface-soft': tokens.surfaceSoft,
                 border: tokens.border,
-                divider: tokens.divider,
+                divider: {
+                    DEFAULT: tokens.divider,
+                    soft: tokens.dividerSoft
+                },
 
                 primary: {
                     DEFAULT: tokens.primary,

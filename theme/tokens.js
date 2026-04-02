@@ -11,6 +11,7 @@ module.exports = {
 
     border: '#AB9B93',
     divider: '#CDC3BC',
+    dividerSoft: '#D9D8D7',
 
     text: '#1F1918',
     textSecondary: '#6F5C54',

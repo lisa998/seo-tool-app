@@ -1,7 +1,14 @@
-import {computed} from "@nuxtjs/composition-api";
+import {computed, useContext} from "@nuxtjs/composition-api";
 
-export default function () {
+export default function (query: Record<string, any> = {}) {
+    const {$axios} = useContext()
+
+    // const fetchOverview = async () => {
+    //     return await $axios.$get('/api/site-explorer/overview')
+    // }
+
     const fake = [68, 69, 70, 70, 71, 72]
+
     const competitiveness = computed(() => [
         {
             title: 'DR 評分',
@@ -35,6 +42,7 @@ export default function () {
                 y: item
             }))
         }])
+
 
     return {competitiveness}
 }

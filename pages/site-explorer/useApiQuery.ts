@@ -1,4 +1,5 @@
-import {computed, reactive, ref, useRoute} from "@nuxtjs/composition-api";
+import {computed, reactive, ref} from "@nuxtjs/composition-api";
+import useRouteQuery from "~/composables/useRouteQuery";
 
 const linkAnalysisKeys = ['backlinks', 'referring-domains', 'anchors', 'broken-links'] as const
 
@@ -16,23 +17,19 @@ export default function () {
         }, {} as Record<LinkAnalysisKey, Query>)
     )
     const activeTab = ref<LinkAnalysisKey>('backlinks')
-    const stringifyQuery = computed(() => {
-        const api = activeTab.value
-        if (!queryObject?.[api]) return ''
-        const params = new URLSearchParams(
-            Object.entries(queryObject[api]).map(([key, value]) => [key, String(value)])
-        )
-        return params.toString()
+    const currentQuery = computed(() => {
+        const currentTab = activeTab.value
+        return queryObject?.[currentTab] ? {...queryObject[currentTab], tab: currentTab} : {}
     })
-    const route = useRoute()
 
-    // 設定query 到route上，但不觸發頁面重新載入
-    function updateRouteQuery() {
-        const query = stringifyQuery.value
-        const url = `${route.value.path}${query ? `?${query}` : ''}`
-        window.history.replaceState(null, '', url)
+    const {defaultQuery} = useRouteQuery(currentQuery)
+    if (defaultQuery?.tab && linkAnalysisKeys.includes(defaultQuery.tab as LinkAnalysisKey)) {
+        activeTab.value = defaultQuery.tab as LinkAnalysisKey
+        const {tab, ...rest} = defaultQuery
+        if (Object.keys(rest).length > 0) {
+            queryObject[activeTab.value] = rest
+        }
     }
-
 
     return {queryObject, activeTab}
 }

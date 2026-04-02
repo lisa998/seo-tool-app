@@ -1,6 +1,10 @@
 import type {NuxtConfig} from '@nuxt/types'
 
 const config: NuxtConfig = {
+    modules: ['@nuxtjs/axios'],
+    axios: {
+        baseURL: 'http://localhost:3000',
+    },
     buildModules: [
         '@nuxt/typescript-build',
         '@nuxtjs/composition-api/module',
@@ -11,9 +15,10 @@ const config: NuxtConfig = {
         '~/assets/styles/tailwind.css'
     ],
     plugins: [
+        '~/plugins/axios',
         '~/plugins/element-ui.ts',
         {src: '~/plugins/highcharts.js', mode: 'client'},
-        {src: '~/plugins/msw.client.ts', mode: 'client'}
+        {src: '~/plugins/msw.client.ts', mode: 'client'},
     ],
     components: true,
     build: {

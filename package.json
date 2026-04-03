@@ -19,7 +19,6 @@
     "element-ui": "^2.15.14",
     "highcharts": "^12.5.0",
     "highcharts-vue": "^1.4.3",
-    "mock-socket": "^9.3.1",
     "msw": "^2.12.14",
     "nuxt": "^2.18.1"
   },

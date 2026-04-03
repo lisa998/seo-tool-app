@@ -9,7 +9,7 @@ import {faker} from '@faker-js/faker'
 export const rankTrackerHandlers = [
     // ─── GET /api/rank-tracker/keywords ──────────────────────
     // 考點：position 多時間點 + sparkline + summary tab 計數
-    http.get('/api/rank-tracker/keywords', async ({request}) => {
+    http.get('*/api/rank-tracker/keywords', async ({request}) => {
         const authErr = requireAuth(request)
         if (authErr) return authErr
         const err = maybeError()
@@ -81,7 +81,7 @@ export const rankTrackerHandlers = [
     }),
 
     // ─── GET /api/rank-tracker/distribution ──────────────────
-    http.get('/api/rank-tracker/distribution', async ({request}) => {
+    http.get('*/api/rank-tracker/distribution', async ({request}) => {
         const authErr = requireAuth(request)
         if (authErr) return authErr
         await delay(200)
@@ -108,7 +108,7 @@ export const rankTrackerHandlers = [
 
     // ─── POST /api/rank-tracker/keywords/batch ──────────────
     // 考點：Optimistic UI + rollback + 原子性批次操作
-    http.post('/api/rank-tracker/keywords/batch', async ({request}) => {
+    http.post('*/api/rank-tracker/keywords/batch', async ({request}) => {
         const authErr = requireAuth(request)
         if (authErr) return authErr
 
@@ -157,7 +157,7 @@ export const rankTrackerHandlers = [
     }),
 
     // ─── GET /api/rank-tracker/tags ──────────────────────────
-    http.get('/api/rank-tracker/tags', async ({request}) => {
+    http.get('*/api/rank-tracker/tags', async ({request}) => {
         const authErr = requireAuth(request)
         if (authErr) return authErr
         await delay(100)
@@ -166,7 +166,7 @@ export const rankTrackerHandlers = [
     }),
 
     // ─── GET /api/rank-tracker/notification-rules ────────────
-    http.get('/api/rank-tracker/notification-rules', async ({request}) => {
+    http.get('*/api/rank-tracker/notification-rules', async ({request}) => {
         const authErr = requireAuth(request)
         if (authErr) return authErr
         await delay(100)
@@ -175,7 +175,7 @@ export const rankTrackerHandlers = [
     }),
 
     // ─── POST /api/rank-tracker/notification-rules ───────────
-    http.post('/api/rank-tracker/notification-rules', async ({request}) => {
+    http.post('*/api/rank-tracker/notification-rules', async ({request}) => {
         const authErr = requireAuth(request)
         if (authErr) return authErr
         await delay(200)

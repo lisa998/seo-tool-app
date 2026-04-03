@@ -13,7 +13,7 @@ const activeAudits = new Map<string, {
 export const auditHandlers = [
     // ─── POST /api/audit/start ──────────────────────────────
     // 考點：回 202 Accepted，streamUrl 告訴前端去哪裡收聽 SSE
-    http.post('/api/audit/start', async ({request}) => {
+    http.post('*/api/audit/start', async ({request}) => {
         const authErr = requireAuth(request)
         if (authErr) return authErr
 
@@ -43,7 +43,7 @@ export const auditHandlers = [
 
     // ─── GET /api/audit/stream/:auditId (SSE) ───────────────
     // 考點：SSE 即時推送 + 斷線重連 (Last-Event-ID) + EventSource 在 mounted 初始化
-    http.get('/api/audit/stream/:auditId', ({params}) => {
+    http.get('*/api/audit/stream/:auditId', ({params}) => {
         const auditId = params.auditId as string
         const audit = activeAudits.get(auditId)
         const totalPages = audit?.maxPages ?? 5000
@@ -122,7 +122,7 @@ export const auditHandlers = [
     }),
 
     // ─── GET /api/audit/report/:auditId ─────────────────────
-    http.get('/api/audit/report/:auditId', async ({request, params}) => {
+    http.get('*/api/audit/report/:auditId', async ({request, params}) => {
         const authErr = requireAuth(request)
         if (authErr) return authErr
         await delay(200)
@@ -159,7 +159,7 @@ export const auditHandlers = [
 
     // ─── GET /api/audit/issues/:auditId ─────────────────────
     // 考點：faceted filter — facets 計數隨篩選條件變化
-    http.get('/api/audit/issues/:auditId', async ({request}) => {
+    http.get('*/api/audit/issues/:auditId', async ({request}) => {
         const authErr = requireAuth(request)
         if (authErr) return authErr
         await delay(250)
@@ -197,7 +197,7 @@ export const auditHandlers = [
 
     // ─── GET /api/audit/url-tree/:auditId ───────────────────
     // 考點：lazy expand — 點擊展開時才呼叫 API
-    http.get('/api/audit/url-tree/:auditId', async ({request}) => {
+    http.get('*/api/audit/url-tree/:auditId', async ({request}) => {
         const authErr = requireAuth(request)
         if (authErr) return authErr
         await delay(150)
@@ -213,7 +213,7 @@ export const auditHandlers = [
 
     // ─── GET /api/audit/export/:auditId ─────────────────────
     // 考點：streaming 匯出 — chunked transfer
-    http.get('/api/audit/export/:auditId', async ({request}) => {
+    http.get('*/api/audit/export/:auditId', async ({request}) => {
         const authErr = requireAuth(request)
         if (authErr) return authErr
 

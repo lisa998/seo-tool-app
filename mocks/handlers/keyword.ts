@@ -40,7 +40,7 @@ const AUTOCOMPLETE_DB: Record<string, Array<{ keyword: string; volume: number; d
 export const keywordHandlers = [
     // ─── GET /api/keyword/autocomplete ───────────────────────
     // 考點：debounce 300ms + AbortController + race condition（不同 db 延遲不同）
-    http.get('/api/keyword/autocomplete', async ({request}) => {
+    http.get('*/api/keyword/autocomplete', async ({request}) => {
         const authErr = requireAuth(request)
         if (authErr) return authErr
 
@@ -66,7 +66,7 @@ export const keywordHandlers = [
     }),
 
     // ─── GET /api/keyword/overview ───────────────────────────
-    http.get('/api/keyword/overview', async ({request}) => {
+    http.get('*/api/keyword/overview', async ({request}) => {
         const authErr = requireAuth(request)
         if (authErr) return authErr
         const err = maybeError()
@@ -96,7 +96,7 @@ export const keywordHandlers = [
     }),
 
     // ─── GET /api/keyword/serp ──────────────────────────────
-    http.get('/api/keyword/serp', async ({request}) => {
+    http.get('*/api/keyword/serp', async ({request}) => {
         const authErr = requireAuth(request)
         if (authErr) return authErr
 
@@ -126,7 +126,7 @@ export const keywordHandlers = [
     }),
 
     // ─── GET /api/keyword/volume-trend ──────────────────────
-    http.get('/api/keyword/volume-trend', async ({request}) => {
+    http.get('*/api/keyword/volume-trend', async ({request}) => {
         const authErr = requireAuth(request)
         if (authErr) return authErr
         await delay(180)
@@ -152,7 +152,7 @@ export const keywordHandlers = [
     }),
 
     // ─── GET /api/keyword/serp-features-history ─────────────
-    http.get('/api/keyword/serp-features-history', async ({request}) => {
+    http.get('*/api/keyword/serp-features-history', async ({request}) => {
         const authErr = requireAuth(request)
         if (authErr) return authErr
         await delay(200)

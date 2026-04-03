@@ -25,7 +25,7 @@ const COLORS: Record<string, string> = {
 export const competitiveHandlers = [
     // ─── GET /api/competitive/compare ────────────────────────
     // 考點：雷達圖 + 表格同步顯示 + 多 domain 並行請求
-    http.get('/api/competitive/compare', async ({request}) => {
+    http.get('*/api/competitive/compare', async ({request}) => {
         const authErr = requireAuth(request)
         if (authErr) return authErr
         const err = maybeError()
@@ -67,7 +67,7 @@ export const competitiveHandlers = [
 
     // ─── GET /api/competitive/traffic-overlay ────────────────
     // 考點：多系列折線圖疊加 + normalize toggle + 時間區間聯動
-    http.get('/api/competitive/traffic-overlay', async ({request}) => {
+    http.get('*/api/competitive/traffic-overlay', async ({request}) => {
         const authErr = requireAuth(request)
         if (authErr) return authErr
         await delay(300)
@@ -106,7 +106,7 @@ export const competitiveHandlers = [
 
     // ─── GET /api/competitive/keyword-gap ────────────────────
     // 考點：大量資料 cursor pagination + 複雜篩選 + 前端 virtual table
-    http.get('/api/competitive/keyword-gap', async ({request}) => {
+    http.get('*/api/competitive/keyword-gap', async ({request}) => {
         const authErr = requireAuth(request)
         if (authErr) return authErr
         await delay('real')
@@ -158,7 +158,7 @@ export const competitiveHandlers = [
 
     // ─── GET /api/competitive/backlink-sources ───────────────
     // 考點：矩陣圖（heatmap）— 多 domain 多 source 的交叉表
-    http.get('/api/competitive/backlink-sources', async ({request}) => {
+    http.get('*/api/competitive/backlink-sources', async ({request}) => {
         const authErr = requireAuth(request)
         if (authErr) return authErr
         await delay(250)
@@ -188,7 +188,7 @@ export const competitiveHandlers = [
 
     // ─── GET /api/competitive/content-velocity ───────────────
     // 考點：stacked bar chart + 月份粒度
-    http.get('/api/competitive/content-velocity', async ({request}) => {
+    http.get('*/api/competitive/content-velocity', async ({request}) => {
         const authErr = requireAuth(request)
         if (authErr) return authErr
         await delay(200)
@@ -214,7 +214,7 @@ export const competitiveHandlers = [
 
     // ─── GET /api/competitive/market-share ───────────────────
     // 考點：treemap / sunburst 視覺化 + 可下鑽（children）
-    http.get('/api/competitive/market-share', async ({request}) => {
+    http.get('*/api/competitive/market-share', async ({request}) => {
         const authErr = requireAuth(request)
         if (authErr) return authErr
         await delay(200)
@@ -247,7 +247,7 @@ export const competitiveHandlers = [
     }),
 
     // ─── GET /api/competitive/dashboard-config ───────────────
-    http.get('/api/competitive/dashboard-config', async ({request}) => {
+    http.get('*/api/competitive/dashboard-config', async ({request}) => {
         const authErr = requireAuth(request)
         if (authErr) return authErr
         await delay(100)
@@ -257,7 +257,7 @@ export const competitiveHandlers = [
 
     // ─── PUT /api/competitive/dashboard-config ───────────────
     // 考點：PUT + debounced auto-save + optimistic update
-    http.put('/api/competitive/dashboard-config', async ({request}) => {
+    http.put('*/api/competitive/dashboard-config', async ({request}) => {
         const authErr = requireAuth(request)
         if (authErr) return authErr
         await delay(300)

@@ -13,7 +13,6 @@ export default function ({$axios}: Context) {
     })
 
     $axios.onRequest((config) => {
-
-        config.headers.common.Authorization = `Bearer `
+        config.headers.common.Authorization = `Bearer test-token-12345`
     })
 }

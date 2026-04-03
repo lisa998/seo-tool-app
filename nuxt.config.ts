@@ -1,6 +1,26 @@
 import type {NuxtConfig} from '@nuxt/types'
 
 const config: NuxtConfig = {
+    hooks: {
+        listen() {
+            console.log('[MSW] listen hook fired, NODE_ENV =', process.env.NODE_ENV)
+            if (process.env.NODE_ENV !== 'development') return
+            try {
+                // Node.js 原生不支援 require('.ts')，需要 jiti 做 runtime 轉譯
+                // jiti 是 Nuxt 2 的 transitive dependency，可直接使用
+                const createJiti = require('jiti')
+                const jiti = createJiti(__filename)
+                const {server} = jiti('./mocks/server')
+                server.listen({onUnhandledRequest: 'bypass'})
+                server.events.on('request:start', ({ request }: { request: Request }) => {
+                    console.log('MSW intercepted:', request.method, request.url)
+                });
+                console.log('[MSW] Server-side Mock 已啟動 🎯')
+            } catch (error) {
+                console.error('[MSW] Server-side 啟動失敗:', error)
+            }
+        },
+    },
     modules: ['@nuxtjs/axios'],
     axios: {
         baseURL: 'http://localhost:3000',
@@ -56,7 +76,7 @@ const config: NuxtConfig = {
         extend(config) {
             // Nuxt 2's babel-loader only matches /\.jsx?$/ — it never processes .mjs files.
             // This rule: (1) tells webpack to treat .mjs as regular JS (not a strict ES module),
-            // and (2) runs babel on it so private fields, class fields, ?. and ?? get transpiled.
+            // and (2) runs babel on it so private fields, class fields, `?.` and `??` get transpiled.
             config.module!.rules!.push({
                 test: /\.(mjs|cjs)$/,
                 include: /node_modules/,

@@ -59,7 +59,7 @@ function generateTrafficTrend(domain: string, range: string) {
 export const domainOverviewHandlers = [
     // ─── GET /api/domain-overview/summary ────────────────────
     // 考點：asyncData 首屏 KPI；下方圖表用 fetch + fetchOnServer: false
-    http.get('/api/domain-overview/summary', async ({request}) => {
+    http.get('*/api/domain-overview/summary', async ({request}) => {
         const authErr = requireAuth(request)
         if (authErr) return authErr
         const err = maybeError()
@@ -87,7 +87,7 @@ export const domainOverviewHandlers = [
 
     // ─── GET /api/domain-overview/traffic-trend ──────────────
     // 考點：時間區間 ↔ 全部圖表聯動 + server-side cache
-    http.get('/api/domain-overview/traffic-trend', async ({request}) => {
+    http.get('*/api/domain-overview/traffic-trend', async ({request}) => {
         const authErr = requireAuth(request)
         if (authErr) return authErr
 
@@ -107,7 +107,7 @@ export const domainOverviewHandlers = [
     }),
 
     // ─── GET /api/domain-overview/referring-domains-growth ───
-    http.get('/api/domain-overview/referring-domains-growth', async ({request}) => {
+    http.get('*/api/domain-overview/referring-domains-growth', async ({request}) => {
         const authErr = requireAuth(request)
         if (authErr) return authErr
 
@@ -134,7 +134,7 @@ export const domainOverviewHandlers = [
     }),
 
     // ─── GET /api/domain-overview/traffic-by-country ─────────
-    http.get('/api/domain-overview/traffic-by-country', async ({request}) => {
+    http.get('*/api/domain-overview/traffic-by-country', async ({request}) => {
         const authErr = requireAuth(request)
         if (authErr) return authErr
         await delay(200)
@@ -162,7 +162,7 @@ export const domainOverviewHandlers = [
     }),
 
     // ─── GET /api/domain-overview/top-keywords ───────────────
-    http.get('/api/domain-overview/top-keywords', async ({request}) => {
+    http.get('*/api/domain-overview/top-keywords', async ({request}) => {
         const authErr = requireAuth(request)
         if (authErr) return authErr
         await delay(200)
@@ -180,7 +180,7 @@ export const domainOverviewHandlers = [
     }),
 
     // ─── GET /api/domain-overview/link-type-distribution ─────
-    http.get('/api/domain-overview/link-type-distribution', async ({request}) => {
+    http.get('*/api/domain-overview/link-type-distribution', async ({request}) => {
         const authErr = requireAuth(request)
         if (authErr) return authErr
         await delay(150)
@@ -201,7 +201,7 @@ export const domainOverviewHandlers = [
     }),
 
     // ─── GET /api/domain-overview/backlinks-new-lost ─────────
-    http.get('/api/domain-overview/backlinks-new-lost', async ({request}) => {
+    http.get('*/api/domain-overview/backlinks-new-lost', async ({request}) => {
         const authErr = requireAuth(request)
         if (authErr) return authErr
         await delay(200)

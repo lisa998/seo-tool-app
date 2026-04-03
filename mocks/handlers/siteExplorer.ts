@@ -17,7 +17,7 @@ import {AnchorItem, Backlink, ReferringDomain} from "~/mocks/types";
 export const siteExplorerHandlers = [
     // ─── GET /api/site-explorer/overview ─────────────────────
     // 考點：asyncData 首屏 + sparkline 與主指標一起回傳
-    http.get('/api/site-explorer/overview', async ({request}) => {
+    http.get('*/api/site-explorer/overview', async ({request}) => {
         const authErr = requireAuth(request)
         if (authErr) return authErr
         const rateErr = checkRateLimit('se-overview')
@@ -56,7 +56,7 @@ export const siteExplorerHandlers = [
 
     // ─── GET /api/site-explorer/backlinks ────────────────────
     // 考點：cursor pagination + virtual scroll + filter ↔ URL sync + appliedFilters
-    http.get('/api/site-explorer/backlinks', async ({request}) => {
+    http.get('*/api/site-explorer/backlinks', async ({request}) => {
         const authErr = requireAuth(request)
         if (authErr) return authErr
         const rateErr = checkRateLimit('se-backlinks')
@@ -110,7 +110,7 @@ export const siteExplorerHandlers = [
     }),
 
     // ─── GET /api/site-explorer/referring-domains ────────────
-    http.get('/api/site-explorer/referring-domains', async ({request}) => {
+    http.get('*/api/site-explorer/referring-domains', async ({request}) => {
         const authErr = requireAuth(request)
         if (authErr) return authErr
         const err = maybeError()
@@ -144,7 +144,7 @@ export const siteExplorerHandlers = [
     }),
 
     // ─── GET /api/site-explorer/anchors ──────────────────────
-    http.get('/api/site-explorer/anchors', async ({request}) => {
+    http.get('*/api/site-explorer/anchors', async ({request}) => {
         const authErr = requireAuth(request)
         if (authErr) return authErr
 
@@ -173,7 +173,7 @@ export const siteExplorerHandlers = [
     }),
 
     // ─── GET /api/site-explorer/broken-links ─────────────────
-    http.get('/api/site-explorer/broken-links', async ({request}) => {
+    http.get('*/api/site-explorer/broken-links', async ({request}) => {
         const authErr = requireAuth(request)
         if (authErr) return authErr
 

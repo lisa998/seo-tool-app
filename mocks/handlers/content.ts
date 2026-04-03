@@ -11,7 +11,7 @@ export const contentHandlers = [
     // ─── GET /api/content/search ─────────────────────────────
     // 考點：infinite scroll (IntersectionObserver) + cursor pagination
     // 考點延伸：多欄位排序 + 搜尋字串高亮（前端負責 highlight）
-    http.get('/api/content/search', async ({request}) => {
+    http.get('*/api/content/search', async ({request}) => {
         const authErr = requireAuth(request)
         if (authErr) return authErr
         const rateErr = checkRateLimit('content-search', 20)
@@ -102,7 +102,7 @@ export const contentHandlers = [
 
     // ─── GET /api/content/trending ───────────────────────────
     // 考點：即時排行榜，與 search 共用資料來源
-    http.get('/api/content/trending', async ({request}) => {
+    http.get('*/api/content/trending', async ({request}) => {
         const authErr = requireAuth(request)
         if (authErr) return authErr
         await delay(200)

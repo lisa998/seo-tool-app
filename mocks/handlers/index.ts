@@ -8,12 +8,16 @@ import {rankTrackerHandlers} from './rankTracker'
 import {contentHandlers} from './content'
 import {competitiveHandlers} from './competitive'
 import {contentGenHandlers} from './contentGen'
+import {editorWsHandler} from '../ws/editorMock'
 
 /**
  * 所有 MSW handler 的統一入口
  * 順序無關緊要，MSW 會根據 method + path 匹配
  * 若有重複 path 則先定義者優先
  * 最後的 catch-all 確保未 mock 的請求直接 passthrough，不影響 Nuxt 內部機制
+ *
+ * WebSocket handler（editorWsHandler）同樣放在這裡，
+ * setupWorker / setupServer 會自動處理 HTTP 與 WS 兩種 handler
  */
 export const handlers = [
     ...authHandlers,
@@ -25,9 +29,8 @@ export const handlers = [
     ...contentHandlers,
     ...competitiveHandlers,
     ...contentGenHandlers,
-
-    // Catch-all: 未被上方 handler 匹配的請求直接放行
-    http.all('*', () => passthrough()),
+    // WebSocket: collaborative editor
+    editorWsHandler,
 ]
 
 // 方便個別模組獨立測試
@@ -41,4 +44,5 @@ export {
     contentHandlers,
     competitiveHandlers,
     contentGenHandlers,
+    editorWsHandler,
 }

@@ -1,7 +1,7 @@
 <template>
   <el-container class="overflow-hidden h-[100vh] bg-bg">
     <el-aside width="250px">
-      <CommonNavMenu/>
+      <CommonNavMenu />
     </el-aside>
     <el-container>
       <el-header class="flex items-center gap-2 text-primary">
@@ -10,20 +10,18 @@
       </el-header>
 
       <el-main>
-        <Nuxt/>
+        <Nuxt />
       </el-main>
     </el-container>
   </el-container>
 </template>
 
 <script lang="ts" setup>
-import {navItems} from '@/constants/routes';
-import {computed, useRoute} from "@nuxtjs/composition-api";
+import { navItems } from '@/constants/routes';
+import { computed, useRoute } from '@nuxtjs/composition-api';
 
-const route = useRoute()
-const activeItem = computed(
-    () => navItems.find(item => item.link === route.value.path) || navItems[0]
-)
+const route = useRoute();
+const activeItem = computed(() => navItems.find((item) => item.link === route.value.path) || navItems[0]);
 </script>
 
 <style>

@@ -1,7 +1,7 @@
-import {Context} from '@nuxt/types'
+import { Context } from '@nuxt/types';
 
-export default function ({route, redirect}: Context) {
-    if (route.path === '/') {
-        return redirect('/site-explorer');
-    }
+export default function ({ route, redirect }: Context) {
+  if (route.path === '/') {
+    return redirect('/site-explorer');
+  }
 }

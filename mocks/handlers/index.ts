@@ -1,14 +1,14 @@
-import {http, passthrough} from 'msw'
-import {authHandlers} from './auth'
-import {siteExplorerHandlers} from './siteExplorer'
-import {domainOverviewHandlers} from './domainOverview'
-import {keywordHandlers} from './keyword'
-import {auditHandlers} from './audit'
-import {rankTrackerHandlers} from './rankTracker'
-import {contentHandlers} from './content'
-import {competitiveHandlers} from './competitive'
-import {contentGenHandlers} from './contentGen'
-import {editorWsHandler} from '../ws/editorMock'
+import { http, passthrough } from 'msw';
+import { authHandlers } from './auth';
+import { siteExplorerHandlers } from './siteExplorer';
+import { domainOverviewHandlers } from './domainOverview';
+import { keywordHandlers } from './keyword';
+import { auditHandlers } from './audit';
+import { rankTrackerHandlers } from './rankTracker';
+import { contentHandlers } from './content';
+import { competitiveHandlers } from './competitive';
+import { contentGenHandlers } from './contentGen';
+import { editorWsHandler } from '../ws/editorMock';
 
 /**
  * 所有 MSW handler 的統一入口
@@ -20,29 +20,29 @@ import {editorWsHandler} from '../ws/editorMock'
  * setupWorker / setupServer 會自動處理 HTTP 與 WS 兩種 handler
  */
 export const handlers = [
-    ...authHandlers,
-    ...siteExplorerHandlers,
-    ...domainOverviewHandlers,
-    ...keywordHandlers,
-    ...auditHandlers,
-    ...rankTrackerHandlers,
-    ...contentHandlers,
-    ...competitiveHandlers,
-    ...contentGenHandlers,
-    // WebSocket: collaborative editor
-    editorWsHandler,
-]
+  ...authHandlers,
+  ...siteExplorerHandlers,
+  ...domainOverviewHandlers,
+  ...keywordHandlers,
+  ...auditHandlers,
+  ...rankTrackerHandlers,
+  ...contentHandlers,
+  ...competitiveHandlers,
+  ...contentGenHandlers,
+  // WebSocket: collaborative editor
+  editorWsHandler,
+];
 
 // 方便個別模組獨立測試
 export {
-    authHandlers,
-    siteExplorerHandlers,
-    domainOverviewHandlers,
-    keywordHandlers,
-    auditHandlers,
-    rankTrackerHandlers,
-    contentHandlers,
-    competitiveHandlers,
-    contentGenHandlers,
-    editorWsHandler,
-}
+  authHandlers,
+  siteExplorerHandlers,
+  domainOverviewHandlers,
+  keywordHandlers,
+  auditHandlers,
+  rankTrackerHandlers,
+  contentHandlers,
+  competitiveHandlers,
+  contentGenHandlers,
+  editorWsHandler,
+};

@@ -1,8 +1,7 @@
 <template>
   <div class="grid gap-8">
     <CommonCard class="flex gap-4">
-      <el-input v-model="targetDomain"
-                placeholder="輸入目標網址 (domain / URL / prefix)"/>
+      <el-input v-model="targetDomain" placeholder="輸入目標網址 (domain / URL / prefix)" />
       <el-button class="w-[120px]" type="primary">分析</el-button>
     </CommonCard>
     <div class="flex gap-4">
@@ -11,30 +10,31 @@
           <p class="text-text-secondary text-sm">{{ data.title }}</p>
           <p v-if="data?.metrics" class="text-text text-2xl ml-2">{{ data?.metrics }}</p>
           <div v-else class="h-1 w-4 bg-divider"></div>
-          <SimplifiedLineGraph v-if="data?.sparklines" :data="data?.sparklines"
-                               class="item-center flex justify-center"/>
+          <SimplifiedLineGraph
+            v-if="data?.sparklines"
+            :data="data?.sparklines"
+            class="item-center flex justify-center"
+          />
         </div>
       </CommonCard>
     </div>
     <el-tabs v-model="activeTab">
       <el-tab-pane
-          v-for="[tabName, tabItem] in tabConfigEntries"
-          :key="tabName"
-          :label="tabItem.label"
-          :name="tabName"
-          class="flex flex-col gap-6"
+        v-for="[tabName, tabItem] in tabConfigEntries"
+        :key="tabName"
+        :label="tabItem.label"
+        :name="tabName"
+        class="flex flex-col gap-6"
       >
         <div class="flex gap-2">
-          <el-select v-for="selector in tabItem?.selectors"
-                     :key="selector.param"
-                     v-model="queryObject[tabName][selector.param]"
-                     :placeholder="selector.label"
-                     clearable>
-            <el-option
-                v-for="item in selector.options"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value">
+          <el-select
+            v-for="selector in tabItem?.selectors"
+            :key="selector.param"
+            v-model="queryObject[tabName][selector.param]"
+            :placeholder="selector.label"
+            clearable
+          >
+            <el-option v-for="item in selector.options" :key="item.value" :label="item.label" :value="item.value">
             </el-option>
           </el-select>
         </div>
@@ -51,32 +51,31 @@
           </template>
         </Table>
       </el-tab-pane>
-
     </el-tabs>
   </div>
 </template>
 
 <script lang="ts" setup>
-import {ref} from "@nuxtjs/composition-api";
-import SimplifiedLineGraph from "~/components/chart/SimplifiedLineGraph.vue";
-import useSiteExplorerData from "~/pages/site-explorer/useSiteExplorerData";
-import useApiQuery, {type LinkAnalysisKey} from "~/pages/site-explorer/useApiQuery";
-import {tabConfig, type TabConfigItem} from "~/pages/site-explorer/constants";
-import Table from "~/components/common/Table.vue";
+import { ref } from '@nuxtjs/composition-api';
+import SimplifiedLineGraph from '~/components/chart/SimplifiedLineGraph.vue';
+import useSiteExplorerData from '~/pages/site-explorer/useSiteExplorerData';
+import useApiQuery, { type LinkAnalysisKey } from '~/pages/site-explorer/useApiQuery';
+import { tabConfig, type TabConfigItem } from '~/pages/site-explorer/constants';
+import Table from '~/components/common/Table.vue';
 
-const tabConfigEntries = Object.entries(tabConfig) as [LinkAnalysisKey, TabConfigItem][]
+const tabConfigEntries = Object.entries(tabConfig) as [LinkAnalysisKey, TabConfigItem][];
 
-const targetDomain = ref('')
-const {queryObject, activeTab} = useApiQuery()
-const {competitiveness} = useSiteExplorerData()
+const targetDomain = ref('');
+const { queryObject, activeTab } = useApiQuery();
+const { competitiveness } = useSiteExplorerData();
 const columnConfig = [
-  {title: '來源頁面', key: 'source', slot: true},
-  {title: '錨文本/目標URL', key: 'anchorTargetUrl', slot: true},
-  {title: 'DR', key: 'dr', slot: false},
-  {title: 'UR', key: 'ur', slot: false},
-  {title: '流量', key: 'traffic', slot: false},
-  {title: '首見日期', key: 'firstSeenDate', slot: false},
-]
+  { title: '來源頁面', key: 'source', slot: true },
+  { title: '錨文本/目標URL', key: 'anchorTargetUrl', slot: true },
+  { title: 'DR', key: 'dr', slot: false },
+  { title: 'UR', key: 'ur', slot: false },
+  { title: '流量', key: 'traffic', slot: false },
+  { title: '首見日期', key: 'firstSeenDate', slot: false },
+];
 
 const data = [
   {
@@ -149,10 +148,7 @@ const data = [
     traffic: 1430,
     firstSeenDate: '2026-03-18',
   },
-]
-
+];
 </script>
 
-<style>
-
-</style>
+<style></style>

@@ -1,5 +1,5 @@
-import {handlers} from './handlers'
-import {setupWorker} from "msw/browser";
+import { handlers } from './handlers';
+import { setupWorker } from 'msw/browser';
 
 /**
  * MSW Browser Worker
@@ -13,7 +13,7 @@ import {setupWorker} from "msw/browser";
  * - 需要先執行 `npx msw init static/` 產生 mockServiceWorker.js
  *   （Nuxt 2 的靜態資源目錄是 static/，不是 public/）
  */
-export const worker = setupWorker(...handlers)
+export const worker = setupWorker(...handlers);
 
 // 可選：匯出 handlers 方便動態增減
-export {handlers}
+export { handlers };

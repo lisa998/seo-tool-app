@@ -1,49 +1,49 @@
 <template>
-  <highcharts ref="highchartsRef" :options="options"/>
+  <highcharts ref="highchartsRef" :options="options" />
 </template>
 <script lang="ts">
-import {defineComponent} from "@nuxtjs/composition-api";
+import { defineComponent } from '@nuxtjs/composition-api';
 
 const chartOptions = {
   xAxis: {
-    visible: false
+    visible: false,
   },
   yAxis: {
-    visible: false
+    visible: false,
   },
   tooltip: {
-    enabled: false
+    enabled: false,
   },
   title: {
-    text: null
+    text: null,
   },
   credits: {
-    enabled: false
+    enabled: false,
   },
   legend: {
-    enabled: false
-  }
-}
+    enabled: false,
+  },
+};
 const lineShadow = {
   color: 'rgba(0,0,0,0.3)',
   offsetX: 3,
   offsetY: 3,
   opacity: 0.4,
-  width: 4
-}
+  width: 4,
+};
 const marker = {
   enabled: false,
   states: {
     hover: {
-      enabled: false
-    }
-  }
-}
+      enabled: false,
+    },
+  },
+};
 export default defineComponent({
   props: {
     lineColor: {
       type: String,
-      default: '#6F5C54'
+      default: '#6F5C54',
     },
     data: {
       type: Array,
@@ -56,17 +56,17 @@ export default defineComponent({
         [50, -2.5],
         [60, -27.7],
         [70, -55.7],
-        [80, -76.5]
-      ]
+        [80, -76.5],
+      ],
     },
     height: {
       type: Number,
-      default: 100
+      default: 100,
     },
     width: {
       type: Number,
-      default: 100
-    }
+      default: 100,
+    },
   },
   computed: {
     options() {
@@ -77,7 +77,7 @@ export default defineComponent({
           height: this.height,
           width: this.width,
           backgroundColor: 'transparent',
-          margin: [0, 0, 0, 0]
+          margin: [0, 0, 0, 0],
         },
 
         series: [
@@ -86,13 +86,11 @@ export default defineComponent({
             data: this.data,
             color: this.lineColor,
             shadow: lineShadow,
-            marker
-          }
-        ]
-      }
-    }
-  }
-})
-
-
+            marker,
+          },
+        ],
+      };
+    },
+  },
+});
 </script>

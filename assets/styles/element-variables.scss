@@ -1,29 +1,29 @@
-$--color-primary: #A48677;
-$--color-success: #7E9D7A;
-$--color-warning: #D89A52;
-$--color-danger: #C96455;
-$--color-info: #8E9BA8;
+$--color-primary: #a48677;
+$--color-success: #7e9d7a;
+$--color-warning: #d89a52;
+$--color-danger: #c96455;
+$--color-info: #8e9ba8;
 
 $--font-path: '~element-ui/lib/theme-chalk/fonts';
 
-@import "~element-ui/packages/theme-chalk/src/index";
+@import '~element-ui/packages/theme-chalk/src/index';
 
 .el-tabs {
   &__nav-wrap {
     &::after {
-      background-color: #CDC3BC !important;
+      background-color: #cdc3bc !important;
     }
   }
 
   &__active-bar {
-    background-color: #6F5C54 !important;
+    background-color: #6f5c54 !important;
   }
 
   &__item {
-    color: #A48677 !important;
+    color: #a48677 !important;
 
     &.is-active {
-      color: #6F5C54 !important;
+      color: #6f5c54 !important;
     }
   }
 }

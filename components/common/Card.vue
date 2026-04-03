@@ -1,6 +1,6 @@
 <template>
   <div class="px-4 py-2 rounded-lg bg-white box-shadow">
-    <slot/>
+    <slot />
   </div>
 </template>
 

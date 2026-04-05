@@ -60,6 +60,7 @@ export const keywordHandlers = [
     const pool = AUTOCOMPLETE_DB[db] ?? AUTOCOMPLETE_DB['us'];
     const suggestions = pool.filter((item) => item.keyword.toLowerCase().includes(q)).slice(0, limit);
 
+    // await delay(10000 * Math.random()); // 模擬不穩定的網路環境
     return HttpResponse.json({ query: q, db, suggestions });
   }),
 

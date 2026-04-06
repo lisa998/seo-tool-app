@@ -25,11 +25,5 @@ export default function (search: Ref<{ keyword: string }>) {
     overviewData.value = metrics;
   });
 
-  const searchAction = async () => {
-    if (search.value.keyword) {
-      await fetchOverview();
-    }
-  };
-
-  return { searchAction, overviewData };
+  return { fetchOverview, overviewData };
 }

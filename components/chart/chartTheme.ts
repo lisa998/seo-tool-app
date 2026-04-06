@@ -75,6 +75,10 @@ const barSeriesThemeByTitle: Record<string, { color: string; borderColor: string
     color: chartColors.warning,
     borderColor: withOpacity(chartColors.warning, 0.92),
   },
+  '搜尋量趨勢（12 個月）': {
+    color: chartColors.warning,
+    borderColor: withOpacity(chartColors.warning, 0.92),
+  },
 };
 
 export function getBarSeriesTheme(title: string) {

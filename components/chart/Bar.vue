@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed } from '@nuxtjs/composition-api';
+import { computed, PropType } from '@nuxtjs/composition-api';
 import { axisLabelStyle, chartColors, chartTitleStyle, getBarSeriesTheme, tooltipTheme } from './chartTheme';
 
 const props = defineProps({
@@ -10,6 +10,29 @@ const props = defineProps({
   height: {
     type: Number,
     default: 300,
+  },
+  categories: {
+    type: Array as PropType<string[]>,
+    default: () => [
+      'Austria',
+      'Estonia',
+      'Sweden',
+      'Italy',
+      'Czechia',
+      'Latvia',
+      'Finland',
+      'Slovenia',
+      'Slovakia',
+      'Denmark',
+    ],
+  },
+  data: {
+    type: Array as PropType<Number[]>,
+    default: () => [24.1, 20.6, 20.3, 15.2, 14.8, 14.5, 13.1, 10.0, 9.9, 9.8],
+  },
+  seriesName: {
+    type: String,
+    default: '',
   },
 });
 
@@ -29,18 +52,7 @@ const options = computed(() => ({
     ...chartTitleStyle,
   },
   xAxis: {
-    categories: [
-      'Austria',
-      'Estonia',
-      'Sweden',
-      'Italy',
-      'Czechia',
-      'Latvia',
-      'Finland',
-      'Slovenia',
-      'Slovakia',
-      'Denmark',
-    ],
+    categories: props.categories,
     lineColor: chartColors.divider,
     tickColor: chartColors.divider,
     labels: axisLabelStyle,
@@ -53,19 +65,12 @@ const options = computed(() => ({
   },
   yAxis: {
     min: 0,
-    max: 30,
-    tickInterval: 10,
     gridLineColor: chartColors.dividerSoft,
     title: {
       text: null,
     },
-    accessibility: {
-      description: 'Organic farming area',
-      rangeDescription: 'Range: 0 to 30%.',
-    },
     labels: {
       overflow: 'justify',
-      format: '{value}%',
       ...axisLabelStyle,
     },
   },
@@ -75,7 +80,6 @@ const options = computed(() => ({
       borderRadius: 4,
       dataLabels: {
         enabled: true,
-        format: '{y}%',
         style: {
           color: chartColors.text,
           fontWeight: '600',
@@ -86,7 +90,6 @@ const options = computed(() => ({
   },
   tooltip: {
     ...tooltipTheme,
-    valueSuffix: '%',
     stickOnContact: true,
   },
   legend: {
@@ -94,10 +97,10 @@ const options = computed(() => ({
   },
   series: [
     {
-      name: 'Organic farming area',
+      name: props.seriesName,
       color: barSeriesTheme.value.color,
       borderColor: barSeriesTheme.value.borderColor,
-      data: [24.1, 20.6, 20.3, 15.2, 14.8, 14.5, 13.1, 10.0, 9.9, 9.8],
+      data: props.data,
     },
   ],
 }));

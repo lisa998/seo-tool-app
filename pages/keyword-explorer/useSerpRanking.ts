@@ -14,15 +14,18 @@ interface SerpResult {
 export default function (search: Ref<{ keyword: string }>) {
   const { $axios } = useContext();
   const serpData = ref<SerpResult[]>([]);
+  const serpRankingLoading = ref(false);
 
   const { fetch: fetchSerpRanking } = useFetch(async () => {
     if (!search.value.keyword) return;
+    serpRankingLoading.value = true;
     const { results } = await $axios.$get(`/api/keyword/serp`, {
       params: {
         keyword: search.value.keyword,
       },
     });
     serpData.value = results;
+    serpRankingLoading.value = false;
   });
 
   const tableSerpData = computed(() =>
@@ -38,5 +41,5 @@ export default function (search: Ref<{ keyword: string }>) {
     }),
   );
 
-  return { tableSerpData, fetchSerpRanking };
+  return { tableSerpData, fetchSerpRanking, serpRankingLoading };
 }

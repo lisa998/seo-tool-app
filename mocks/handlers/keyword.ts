@@ -3,7 +3,7 @@ import { delay, http, HttpResponse } from 'msw';
 import { requireAuth } from '../utils/auth';
 import { maybeError } from '../utils/errorInjection';
 import { SERP_FEATURES } from '../factories/dataStore';
-import { faker } from '@faker-js/faker';
+import { faker } from '@faker-js/faker'; // ─── Autocomplete 假資料（per db，確保一致性）──────────────
 
 // ─── Autocomplete 假資料（per db，確保一致性）──────────────
 const AUTOCOMPLETE_DB: Record<string, Array<{ keyword: string; volume: number; difficulty: number }>> = {
@@ -99,7 +99,7 @@ export const keywordHandlers = [
     const authErr = requireAuth(request);
     if (authErr) return authErr;
 
-    await delay(250);
+    await delay(2500);
 
     const url = new URL(request.url);
     const keyword = url.searchParams.get('keyword') ?? 'seo tools';
@@ -126,7 +126,7 @@ export const keywordHandlers = [
   http.get('*/api/keyword/volume-trend', async ({ request }) => {
     const authErr = requireAuth(request);
     if (authErr) return authErr;
-    await delay(180);
+    await delay(1800);
 
     const url = new URL(request.url);
     const keyword = url.searchParams.get('keyword') ?? 'seo tools';
@@ -152,7 +152,7 @@ export const keywordHandlers = [
   http.get('*/api/keyword/serp-features-history', async ({ request }) => {
     const authErr = requireAuth(request);
     if (authErr) return authErr;
-    await delay(200);
+    await delay(2000);
 
     const now = new Date();
     return HttpResponse.json({

@@ -13,15 +13,18 @@ export default function (search: Ref<{ keyword: string }>) {
   const { $axios } = useContext();
 
   const volumeTrendData = ref<VolumeTrendItem[]>([]);
+  const volumeTrendLoading = ref(false);
 
   const { fetch: fetchVolumeTrend } = useFetch(async () => {
     if (!search.value.keyword) return;
+    volumeTrendLoading.value = true;
     const { months } = await $axios.$get<VolumeTrendResp>('/api/keyword/volume-trend', {
       params: {
         keyword: search.value.keyword,
       },
     });
     volumeTrendData.value = months;
+    volumeTrendLoading.value = false;
   });
 
   const barData = computed(() => {
@@ -32,5 +35,5 @@ export default function (search: Ref<{ keyword: string }>) {
     };
   });
 
-  return { barData, fetchVolumeTrend };
+  return { barData, fetchVolumeTrend, volumeTrendLoading };
 }

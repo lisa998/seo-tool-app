@@ -17,15 +17,20 @@ type SerpFeature = (typeof SERP_FEATURES)[number];
 export default function (search: Ref<{ keyword: string }>) {
   const { $axios } = useContext();
   const serpFeaturesHistoryData = ref<{ date: string; features: SerpFeature[] }[]>([]);
+  const serpFeaturesLoading = ref(false);
+
   useFetch(async () => {
     if (!search.value.keyword) return;
+    serpFeaturesLoading.value = true;
     const { history } = await $axios.$get(`/api/keyword/serp-features-history`, {
       params: {
         keyword: search.value.keyword,
       },
     });
     serpFeaturesHistoryData.value = history;
+    serpFeaturesLoading.value = false;
   });
+
 
   const heatmapData = computed(() => {
     if (serpFeaturesHistoryData.value.length === 0) return { date: [], features: [] };
@@ -48,5 +53,5 @@ export default function (search: Ref<{ keyword: string }>) {
 
   const allSerpFeatures = [...SERP_FEATURES];
 
-  return { serpFeaturesHistoryData, heatmapData, allSerpFeatures };
+  return { serpFeaturesHistoryData, heatmapData, allSerpFeatures, serpFeaturesLoading };
 }

@@ -27,7 +27,7 @@ const props = defineProps({
     ],
   },
   data: {
-    type: Array as PropType<Number[]>,
+    type: Array as PropType<number[]>,
     default: () => [24.1, 20.6, 20.3, 15.2, 14.8, 14.5, 13.1, 10.0, 9.9, 9.8],
   },
   seriesName: {

@@ -12,7 +12,7 @@ const props = defineProps({
     default: 400,
   },
   data: {
-    type: Array as PropType<Array<Array<Number>>>,
+    type: Array as PropType<Array<Array<number>>>,
     default: () => [
       // [x, y, value]  x=月份index, y=feature index, value=0或1
       [0, 0, 1],

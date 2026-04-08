@@ -35,7 +35,7 @@ export default function (search: { keyword: string }) {
     if (serpFeaturesHistoryData.value.length === 0) return { date: [], features: [] };
 
     const date: string[] = [];
-    const features: Array<Array<Number>> = [];
+    const features: Array<Array<number>> = [];
 
     serpFeaturesHistoryData.value.forEach((item, dateIndex) => {
       date.push(item.date.split('-').slice(0, 2).join('-'));

@@ -1,4 +1,4 @@
-import { computed, ref, Ref, useContext, useFetch } from '@nuxtjs/composition-api';
+import { computed, ref, useContext } from '@nuxtjs/composition-api';
 
 export const SERP_FEATURES = [
   'featured_snippet',
@@ -14,23 +14,22 @@ export const SERP_FEATURES = [
 
 type SerpFeature = (typeof SERP_FEATURES)[number];
 
-export default function (search: Ref<{ keyword: string }>) {
+export default function (search: { keyword: string }) {
   const { $axios } = useContext();
   const serpFeaturesHistoryData = ref<{ date: string; features: SerpFeature[] }[]>([]);
   const serpFeaturesLoading = ref(false);
 
-  useFetch(async () => {
-    if (!search.value.keyword) return;
+  const fetchSerpFeaturesHistory = async () => {
+    if (!search.keyword) return;
     serpFeaturesLoading.value = true;
     const { history } = await $axios.$get(`/api/keyword/serp-features-history`, {
       params: {
-        keyword: search.value.keyword,
+        keyword: search.keyword,
       },
     });
     serpFeaturesHistoryData.value = history;
     serpFeaturesLoading.value = false;
-  });
-
+  };
 
   const heatmapData = computed(() => {
     if (serpFeaturesHistoryData.value.length === 0) return { date: [], features: [] };
@@ -53,5 +52,5 @@ export default function (search: Ref<{ keyword: string }>) {
 
   const allSerpFeatures = [...SERP_FEATURES];
 
-  return { serpFeaturesHistoryData, heatmapData, allSerpFeatures, serpFeaturesLoading };
+  return { serpFeaturesHistoryData, heatmapData, allSerpFeatures, serpFeaturesLoading, fetchSerpFeaturesHistory };
 }

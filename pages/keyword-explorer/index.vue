@@ -10,8 +10,9 @@
         @select="handleSelect"
       >
         <template v-slot="{ item }">
-          <div :class="{ 'no-result': item.disabled }">
-            {{ item.keyword }}
+          <div :class="{ 'no-result': item.disabled }" class="flex justify-between items-center">
+            <p>{{ item.keyword }}</p>
+            <p v-if="!item.disabled" class="text-text-muted text-sm">vol: {{ item.volume }}</p>
           </div>
         </template>
       </el-autocomplete>
@@ -88,7 +89,7 @@ import useOverview, { metricEntries } from '~/pages/keyword-explorer/useOverview
 import Bar from '~/components/chart/Bar.vue';
 import Heatmap from '~/components/chart/Heatmap.vue';
 import useSerpRanking from '~/pages/keyword-explorer/useSerpRanking';
-import { nextTick, useFetch } from '@nuxtjs/composition-api';
+import { nextTick, onMounted, useFetch } from '@nuxtjs/composition-api';
 import Table from '~/components/common/Table.vue';
 import useVolumeTrend from '~/pages/keyword-explorer/useVolumeTrend';
 import useSerpFeaturesHistory from '~/pages/keyword-explorer/useSerpFeaturesHistory';
@@ -97,19 +98,25 @@ import NotSearchYet from '~/components/common/NotSearchYet.vue';
 
 const { search, querySearch, handleSelect } = useSearch();
 
-const { overviewData } = useOverview(search);
+const { overviewData, fetchOverview } = useOverview(search);
 
-const { tableSerpData, serpRankingLoading } = useSerpRanking(search);
+const { tableSerpData, serpRankingLoading, fetchSerpRanking } = useSerpRanking(search);
 
-const { barData, volumeTrendLoading } = useVolumeTrend(search);
+const { barData, volumeTrendLoading, fetchVolumeTrend } = useVolumeTrend(search);
 
-const { heatmapData, allSerpFeatures, serpFeaturesLoading } = useSerpFeaturesHistory(search);
+const { heatmapData, allSerpFeatures, serpFeaturesLoading, fetchSerpFeaturesHistory } = useSerpFeaturesHistory(search);
 
-// 統一觸發 useFetch
-const { fetch: fetchAll } = useFetch(() => {});
+useFetch(async () => {
+  await Promise.allSettled([fetchOverview(), fetchSerpRanking()]);
+});
+
+//high-chart data fetch in client
+onMounted(async () => {
+  await Promise.allSettled([fetchVolumeTrend(), fetchSerpFeaturesHistory()]);
+});
 
 const searchAction = async () => {
-  await fetchAll();
+  await Promise.allSettled([fetchOverview(), fetchSerpRanking(), fetchVolumeTrend(), fetchSerpFeaturesHistory()]);
   await nextTick();
   window.dispatchEvent(new Event('resize'));
 };

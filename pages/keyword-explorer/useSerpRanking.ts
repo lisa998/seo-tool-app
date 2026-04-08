@@ -1,4 +1,4 @@
-import { computed, Ref, ref, useContext, useFetch } from '@nuxtjs/composition-api';
+import { computed, ref, ssrRef, useContext } from '@nuxtjs/composition-api';
 
 interface SerpResult {
   position: number;
@@ -11,22 +11,22 @@ interface SerpResult {
   featuredSnippet: boolean;
 }
 
-export default function (search: Ref<{ keyword: string }>) {
+export default function (search: { keyword: string }) {
   const { $axios } = useContext();
-  const serpData = ref<SerpResult[]>([]);
+  const serpData = ssrRef<SerpResult[]>([], 'serpData');
   const serpRankingLoading = ref(false);
 
-  const { fetch: fetchSerpRanking } = useFetch(async () => {
-    if (!search.value.keyword) return;
+  const fetchSerpRanking = async () => {
+    if (!search.keyword) return;
     serpRankingLoading.value = true;
     const { results } = await $axios.$get(`/api/keyword/serp`, {
       params: {
-        keyword: search.value.keyword,
+        keyword: search.keyword,
       },
     });
     serpData.value = results;
     serpRankingLoading.value = false;
-  });
+  };
 
   const tableSerpData = computed(() =>
     serpData.value.map((item) => {

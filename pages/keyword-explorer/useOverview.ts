@@ -1,4 +1,4 @@
-import { Ref, ref, useContext, useFetch } from '@nuxtjs/composition-api';
+import { ref, useContext } from '@nuxtjs/composition-api';
 
 const metrics = {
   volume: '月搜尋量',
@@ -11,19 +11,19 @@ type MetricsKey = keyof typeof metrics;
 type OverviewMetrics = Record<MetricsKey, number>;
 export const metricEntries = Object.entries(metrics) as [MetricsKey, string][];
 
-export default function (search: Ref<{ keyword: string }>) {
+export default function (search: { keyword: string }) {
   const overviewData = ref<OverviewMetrics | null>(null);
 
   const { $axios } = useContext();
-  const { fetch: fetchOverview } = useFetch(async () => {
-    if (!search.value.keyword) return;
+  const fetchOverview = async () => {
+    if (!search.keyword) return;
     const { metrics } = await $axios.$get(`/api/keyword/overview`, {
       params: {
-        keyword: search.value.keyword,
+        keyword: search.keyword,
       },
     });
     overviewData.value = metrics;
-  });
+  };
 
   return { fetchOverview, overviewData };
 }

@@ -1,6 +1,13 @@
-import { useRoute, useRouter, watch } from '@nuxtjs/composition-api';
+import { isReactive, isRef, Ref, useRoute, useRouter, watch } from '@nuxtjs/composition-api';
 
-export default function (query: Record<string, any>) {
+type Query = Record<string, any>;
+type QuerySource = Ref<Query> | Query;
+
+export default function (query: QuerySource) {
+  if (!isRef(query) && !isReactive(query)) {
+    console.error('query needs reactive');
+    return { defaultQuery: {} };
+  }
   const route = useRoute();
   const router = useRouter();
 

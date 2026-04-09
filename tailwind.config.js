@@ -4,8 +4,8 @@ const tokens = require('./theme/tokens');
 module.exports = {
   content: [
     './components/**/*.{vue,js,ts}',
-    './layouts/**/*.vue',
-    './pages/**/*.vue',
+    './layouts/**/*.{vue,js,ts}',
+    './pages/**/*.{vue,js,ts}',
     './plugins/**/*.{js,ts}',
     './nuxt.config.{js,ts}',
   ],

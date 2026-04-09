@@ -12,7 +12,8 @@ const chartOptions = {
     visible: false,
   },
   tooltip: {
-    enabled: false,
+    headerFormat: '',
+    pointFormat: '{series.name}: <b>{point.y}</b>',
   },
   title: {
     text: null,
@@ -51,6 +52,10 @@ const props = defineProps({
     type: Number,
     default: 100,
   },
+  title: {
+    type: String,
+    default: '',
+  },
 });
 
 const lineShadow = {
@@ -83,6 +88,7 @@ const options = computed(() => {
     series: [
       {
         type: 'line',
+        name: props.title,
         data: props.data,
         color: props.lineColor,
         shadow: lineShadow,

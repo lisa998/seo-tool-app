@@ -1,3 +1,7 @@
+import { type BacklinksViewModel } from '~/mappers/site-explorer/backlinks.mapper';
+import { type BrokenLinksViewModel } from '~/mappers/site-explorer/brokenLinks';
+import { type AnchorsViewModel } from '~/mappers/site-explorer/anchors.mapper';
+import { type ReferringDomainsViewModel } from '~/mappers/site-explorer/referringDomains.mapper';
 import { LinkAnalysisKey } from '~/pages/site-explorer/useApiQuery';
 
 interface Option<T> {
@@ -21,6 +25,21 @@ export interface TabConfigItem {
   apiPath: string;
   selectors: Selector[];
 }
+
+type ColumnConfigItem<T extends object> = {
+  title: string;
+  key: Extract<keyof T, string>;
+  slot: boolean;
+};
+
+type ColumnConfigMap = {
+  backlinks: ColumnConfigItem<BacklinksViewModel>[];
+  'referring-domains': ColumnConfigItem<ReferringDomainsViewModel>[];
+  anchors: ColumnConfigItem<AnchorsViewModel>[];
+  'broken-links': ColumnConfigItem<BrokenLinksViewModel>[];
+};
+
+type GridTemplateMap = Record<LinkAnalysisKey, string>;
 
 //api params options
 export const LINK_TYPES = ['dofollow', 'nofollow', 'ugc', 'sponsored'] as const;
@@ -121,4 +140,54 @@ export const tabConfig: Record<LinkAnalysisKey, TabConfigItem> = {
       },
     ],
   },
+};
+
+const backLinksColumnConfig: ColumnConfigItem<BacklinksViewModel>[] = [
+  { title: '來源頁面', key: 'source', slot: true },
+  { title: '錨文本/目標URL', key: 'anchorTargetUrl', slot: true },
+  { title: 'DR', key: 'dr', slot: false },
+  { title: 'UR', key: 'ur', slot: false },
+  { title: '流量', key: 'traffic', slot: false },
+  { title: '首見日期', key: 'firstSeen', slot: false },
+];
+
+const referringDomainsColumnConfig: ColumnConfigItem<ReferringDomainsViewModel>[] = [
+  { title: '參照網域', key: 'domain', slot: false },
+  { title: 'DR', key: 'domainRating', slot: false },
+  { title: 'Dofollow', key: 'dofollow', slot: false },
+  { title: 'Nofollow', key: 'nofollow', slot: false },
+  { title: '反連數', key: 'backlinksCount', slot: false },
+  { title: '首見日期', key: 'firstSeen', slot: false },
+  { title: '最後發現', key: 'lastSeen', slot: false },
+];
+
+const anchorsColumnConfig: ColumnConfigItem<AnchorsViewModel>[] = [
+  { title: '錨文本', key: 'anchor', slot: false },
+  { title: '流量', key: 'traffic', slot: false },
+  { title: '反連數', key: 'backlinks', slot: false },
+  { title: '參照網域數', key: 'referringDomains', slot: false },
+  { title: '首見日期', key: 'firstSeen', slot: false },
+];
+
+const brokenLinksColumnConfig: ColumnConfigItem<BrokenLinksViewModel>[] = [
+  { title: '來源頁面', key: 'sourceUrl', slot: false },
+  { title: '錨文本/目標URL', key: 'anchorTargetUrl', slot: true },
+  { title: 'HTTP 狀態碼', key: 'httpCode', slot: false },
+  { title: 'DR', key: 'sourceDR', slot: false },
+  { title: '參照網域數', key: 'referringDomains', slot: false },
+  { title: '首見日期', key: 'firstSeen', slot: false },
+];
+
+export const gridTemplateMap: GridTemplateMap = {
+  backlinks: 'grid-cols-[6fr_3fr_1fr_1fr_1.5fr_2fr]',
+  'referring-domains': 'grid-cols-[3fr_1fr_1.5fr_1.5fr_1.5fr_2fr_2fr]',
+  anchors: 'grid-cols-[4fr_2fr_2fr_2fr_2fr]',
+  'broken-links': 'grid-cols-[6fr_3fr_3fr_1fr_2.5fr_2fr]',
+};
+
+export const columnConfigMap: ColumnConfigMap = {
+  backlinks: backLinksColumnConfig,
+  'referring-domains': referringDomainsColumnConfig,
+  anchors: anchorsColumnConfig,
+  'broken-links': brokenLinksColumnConfig,
 };

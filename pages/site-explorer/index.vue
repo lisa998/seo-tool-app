@@ -51,22 +51,36 @@
             </el-option>
           </el-select>
         </div>
-        <Table :columnConfig="columnConfig" :data="dataObject[activeTab]?.data" :gridTemplate="gridTemplate">
-          <template v-slot:source="{ row }">
-            <template v-if="row.source">
-              <a :href="`https://${row.source?.url}`" class="text-primary-active hover:underline" target="_blank">
-                {{ row.source?.url }}
-              </a>
-              <div class="text-text-muted">{{ row.source?.title }}</div>
+        <div class="overflow-hidden rounded-lg table-border">
+          <virtual-scroll
+            :items-length="dataObject[activeTab]?.data.length"
+            :row-height="61"
+            class="overflow-hidden rounded-lg table-border"
+          >
+            <template v-slot="{ startIndex, endIndex }">
+              <Table
+                :columnConfig="columnConfig"
+                :data="virtualTable(startIndex, endIndex)"
+                :gridTemplate="gridTemplate"
+              >
+                <template v-slot:source="{ row }">
+                  <template v-if="row.source">
+                    <a :href="`https://${row.source?.url}`" class="text-primary-active" target="_blank">
+                      {{ row.source?.url }}
+                    </a>
+                    <div class="text-text-muted">{{ row.source?.title }}</div>
+                  </template>
+                </template>
+                <template v-slot:anchorTargetUrl="{ row }">
+                  <template v-if="row.anchorTargetUrl">
+                    <div class="text-text">{{ row.anchorTargetUrl?.text }}</div>
+                    <div class="text-text-muted text-sm">{{ row.anchorTargetUrl?.url }}</div>
+                  </template>
+                </template>
+              </Table>
             </template>
-          </template>
-          <template v-slot:anchorTargetUrl="{ row }">
-            <template v-if="row.anchorTargetUrl">
-              <div class="text-text">{{ row.anchorTargetUrl?.text }}</div>
-              <div class="text-text-muted text-sm">{{ row.anchorTargetUrl?.url }}</div>
-            </template>
-          </template>
-        </Table>
+          </virtual-scroll>
+        </div>
       </el-tab-pane>
     </el-tabs>
   </div>
@@ -80,6 +94,7 @@ import useApiQuery, { type LinkAnalysisKey } from '~/pages/site-explorer/useApiQ
 import { columnConfigMap, gridTemplateMap, tabConfig, type TabConfigItem } from '~/pages/site-explorer/constants';
 import Table from '~/components/common/Table.vue';
 import NotSearchYet from '~/components/common/NotSearchYet.vue';
+import VirtualScroll from '~/components/common/VirtualScroll.vue';
 
 const tabConfigEntries = Object.entries(tabConfig) as [LinkAnalysisKey, TabConfigItem][];
 
@@ -100,78 +115,10 @@ const search = async () => {
 const columnConfig = computed(() => columnConfigMap[activeTab.value]);
 const gridTemplate = computed(() => gridTemplateMap[activeTab.value]);
 
-const data = [
-  {
-    source: {
-      title: 'Title...',
-      url: 'example1.com/page-1',
-    },
-    anchorTargetUrl: {
-      text: 'SEO 工具介紹',
-      url: 'target-site.com/seo-tools',
-    },
-    dr: 72,
-    ur: 38,
-    traffic: 1250,
-    firstSeenDate: '2026-03-01',
-  },
-  {
-    source: {
-      title: 'example2.com/page-1',
-      url: 'example2.com/page-1',
-    },
-    anchorTargetUrl: {
-      text: '關鍵字研究',
-      url: 'target-site.com/keyword-research',
-    },
-    dr: 65,
-    ur: 41,
-    traffic: 980,
-    firstSeenDate: '2026-03-05',
-  },
-  {
-    source: {
-      title: 'example3.com/blog-2',
-      url: 'https://example3.com/blog-2',
-    },
-    anchorTargetUrl: {
-      text: '反向連結分析',
-      url: 'https://target-site.com/backlink-analysis',
-    },
-    dr: 58,
-    ur: 35,
-    traffic: 760,
-    firstSeenDate: '2026-03-08',
-  },
-  {
-    source: {
-      title: 'example4.com/article-3',
-      url: 'https://example4.com/article-3',
-    },
-    anchorTargetUrl: {
-      text: '網站健檢',
-      url: 'https://target-site.com/site-audit',
-    },
-    dr: 80,
-    ur: 49,
-    traffic: 2100,
-    firstSeenDate: '2026-03-12',
-  },
-  {
-    source: {
-      title: 'example5.com/post-4',
-      url: 'https://example5.com/post-4',
-    },
-    anchorTargetUrl: {
-      text: '內容優化',
-      url: 'https://target-site.com/content-optimization',
-    },
-    dr: 69,
-    ur: 43,
-    traffic: 1430,
-    firstSeenDate: '2026-03-18',
-  },
-];
+const virtualTable = computed(() => {
+  const data = dataObject[activeTab.value]?.data || [];
+  return (startIndex: number, endIndex: number) => data.slice(startIndex, endIndex);
+});
 </script>
 
 <style></style>

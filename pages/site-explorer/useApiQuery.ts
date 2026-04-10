@@ -90,8 +90,14 @@ export default function () {
   const createFetchTask = <K extends LinkAnalysisKey>(key: K) => {
     return () =>
       withLoading(toRef(loadingStatus, key), async () => {
+        const queryParams = queryObject[key] || {};
+        Object.entries(queryParams).forEach(([k, v]) => {
+          if (!v) {
+            delete queryParams[k];
+          }
+        });
         const { data, pagination } = await $axios.$get<ApiResp<K>>(`/api/site-explorer/${key}`, {
-          params: { domain: 'mysite.com', ...queryObject[key] },
+          params: { domain: 'mysite.com', ...queryParams },
         });
         dataObject[key] = {
           data: data.map((d) => mapper[key](d)),

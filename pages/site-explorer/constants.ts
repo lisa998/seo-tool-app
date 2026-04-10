@@ -191,3 +191,10 @@ export const columnConfigMap: ColumnConfigMap = {
   anchors: anchorsColumnConfig,
   'broken-links': brokenLinksColumnConfig,
 };
+
+export const virtualScrollRowHeightMap = {
+  backlinks: 61,
+  'referring-domains': 39,
+  anchors: 39,
+  'broken-links': 59,
+};

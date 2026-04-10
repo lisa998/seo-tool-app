@@ -51,12 +51,9 @@
             </el-option>
           </el-select>
         </div>
-        <div class="overflow-hidden rounded-lg table-border">
-          <virtual-scroll
-            :items-length="dataObject[activeTab]?.data.length"
-            :row-height="61"
-            class="overflow-hidden rounded-lg table-border"
-          >
+        <table-skeleton v-if="dataObject[activeTab]?.data.length === 0" :grid-cols="gridTemplate" />
+        <div v-else class="overflow-hidden rounded-lg table-border">
+          <virtual-scroll :items-length="dataObject[activeTab]?.data.length" :row-height="virtualScrollRowHeight">
             <template v-slot="{ startIndex, endIndex }">
               <Table
                 :columnConfig="columnConfig"
@@ -91,10 +88,17 @@ import { computed, nextTick, onMounted, ref } from '@nuxtjs/composition-api';
 import SimplifiedLineGraph from '~/components/chart/SimplifiedLineGraph.vue';
 import useSiteExplorerData from '~/pages/site-explorer/useSiteExplorerData';
 import useApiQuery, { type LinkAnalysisKey } from '~/pages/site-explorer/useApiQuery';
-import { columnConfigMap, gridTemplateMap, tabConfig, type TabConfigItem } from '~/pages/site-explorer/constants';
+import {
+  columnConfigMap,
+  gridTemplateMap,
+  tabConfig,
+  type TabConfigItem,
+  virtualScrollRowHeightMap,
+} from '~/pages/site-explorer/constants';
 import Table from '~/components/common/Table.vue';
 import NotSearchYet from '~/components/common/NotSearchYet.vue';
 import VirtualScroll from '~/components/common/VirtualScroll.vue';
+import TableSkeleton from '~/components/common/TableSkeleton.vue';
 
 const tabConfigEntries = Object.entries(tabConfig) as [LinkAnalysisKey, TabConfigItem][];
 
@@ -119,6 +123,8 @@ const virtualTable = computed(() => {
   const data = dataObject[activeTab.value]?.data || [];
   return (startIndex: number, endIndex: number) => data.slice(startIndex, endIndex);
 });
+
+const virtualScrollRowHeight = computed(() => virtualScrollRowHeightMap[activeTab.value]);
 </script>
 
 <style></style>

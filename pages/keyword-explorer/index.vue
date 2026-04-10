@@ -58,11 +58,9 @@
           <el-skeleton animated>
             <template #template>
               <el-skeleton-item style="width: 20%; margin-bottom: 12px" variant="h3" />
-              <div v-for="row in 6" :key="row" class="grid grid-cols-[1fr_6fr_1fr_1fr_2fr_2fr] gap-2 mb-4">
-                <el-skeleton-item v-for="i in 6" :key="'cell-' + row + '-' + i" variant="text" />
-              </div>
             </template>
           </el-skeleton>
+          <table-skeleton grid-cols="grid-cols-[1fr_6fr_1fr_1fr_2fr_2fr]" />
         </div>
         <not-search-yet v-else-if="tableSerpData.length === 0" />
         <div v-else>
@@ -95,6 +93,7 @@ import useVolumeTrend from '~/pages/keyword-explorer/useVolumeTrend';
 import useSerpFeaturesHistory from '~/pages/keyword-explorer/useSerpFeaturesHistory';
 import ChartSkeleton from '~/components/chart/ChartSkeleton.vue';
 import NotSearchYet from '~/components/common/NotSearchYet.vue';
+import TableSkeleton from '~/components/common/TableSkeleton.vue';
 
 const { search, querySearch, handleSelect } = useSearch();
 

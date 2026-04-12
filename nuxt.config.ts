@@ -26,7 +26,7 @@ const config: NuxtConfig = {
     baseURL: 'http://localhost:3000',
   },
   buildModules: ['@nuxt/typescript-build', '@nuxtjs/composition-api/module', '@nuxtjs/tailwindcss'],
-  css: ['~/assets/styles/element-variables.scss', '~/assets/styles/tailwind.css'],
+  css: ['~/assets/styles/element-variables.scss', '~/assets/styles/tailwind.css', '~/assets/styles/global.css'],
   plugins: [
     '~/plugins/axios',
     '~/plugins/element-ui.ts',

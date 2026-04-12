@@ -65,16 +65,20 @@
         <not-search-yet v-else-if="tableSerpData.length === 0" />
         <div v-else>
           <h3 class="text-text-secondary mb-2">SERP 排名結果</h3>
-          <Table :column-config="columnConfig" :data="tableSerpData" gridTemplate="grid-cols-[1fr_6fr_1fr_1fr_2fr_2fr]">
-            <template v-slot:rank="{ row }">
-              <span :class="row.rank < 4 ? 'text-accent' : ''">{{ row.rank }}</span>
-            </template>
-            <template v-slot:url="{ row }">
-              <a :href="`https://${row.url}`" class="text-primary-active hover:underline" target="_blank">{{
-                row.url
-              }}</a>
-            </template>
-          </Table>
+          <div class="table-border">
+            <Table
+              :column-config="columnConfig"
+              :data="tableSerpData"
+              gridTemplate="grid-cols-[1fr_6fr_1fr_1fr_2fr_2fr]"
+            >
+              <template v-slot:rank="{ row }">
+                <span :class="row.rank < 4 ? 'text-accent' : ''">{{ row.rank }}</span>
+              </template>
+              <template v-slot:url="{ row }">
+                <common-link :href="row?.url">{{ row?.url }}</common-link>
+              </template>
+            </Table>
+          </div>
         </div>
       </common-card>
     </div>

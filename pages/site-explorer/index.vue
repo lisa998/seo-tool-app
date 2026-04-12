@@ -63,7 +63,7 @@
           </el-select>
         </div>
         <table-skeleton v-if="dataObject[activeTab]?.data.length === 0" :grid-cols="gridTemplate" />
-        <div v-else class="overflow-hidden rounded-lg table-border">
+        <div v-else class="table-border">
           <virtual-scroll :items-length="dataObject[activeTab]?.data.length" :row-height="virtualScrollRowHeight">
             <template v-slot="{ startIndex, endIndex }">
               <Table
@@ -73,10 +73,10 @@
               >
                 <template v-slot:source="{ row }">
                   <template v-if="row.source">
-                    <a :href="`https://${row.source?.url}`" class="text-primary-active" target="_blank">
+                    <common-link :href="row.source?.url">
                       {{ row.source?.url }}
-                    </a>
-                    <div class="text-text-muted">{{ row.source?.title }}</div>
+                    </common-link>
+                    <div class="text-text-muted truncate">{{ row.source?.title }}</div>
                   </template>
                 </template>
                 <template v-slot:anchorTargetUrl="{ row }">
@@ -145,5 +145,3 @@ const handleSelect = (item: string) => {
   targetDomain.value = item;
 };
 </script>
-
-<style></style>

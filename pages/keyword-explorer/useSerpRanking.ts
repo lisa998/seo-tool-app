@@ -1,4 +1,5 @@
 import { computed, ref, ssrRef, useContext } from '@nuxtjs/composition-api';
+import withLoading from '~/utils/withLoading';
 
 interface SerpResult {
   position: number;
@@ -16,17 +17,16 @@ export default function (search: { keyword: string }) {
   const serpData = ssrRef<SerpResult[]>([], 'serpData');
   const serpRankingLoading = ref(false);
 
-  const fetchSerpRanking = async () => {
-    if (!search.keyword) return;
-    serpRankingLoading.value = true;
-    const { results } = await $axios.$get(`/api/keyword/serp`, {
-      params: {
-        keyword: search.keyword,
-      },
+  const fetchSerpRanking = () =>
+    withLoading(serpRankingLoading, async () => {
+      if (!search.keyword) return;
+      const { results } = await $axios.$get(`/api/keyword/serp`, {
+        params: {
+          keyword: search.keyword,
+        },
+      });
+      serpData.value = results;
     });
-    serpData.value = results;
-    serpRankingLoading.value = false;
-  };
 
   const tableSerpData = computed(() =>
     serpData.value.map((item) => {

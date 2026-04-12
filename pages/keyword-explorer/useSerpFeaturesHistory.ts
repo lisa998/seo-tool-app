@@ -1,4 +1,5 @@
 import { computed, ref, useContext } from '@nuxtjs/composition-api';
+import withLoading from '~/utils/withLoading';
 
 export const SERP_FEATURES = [
   'featured_snippet',
@@ -19,17 +20,16 @@ export default function (search: { keyword: string }) {
   const serpFeaturesHistoryData = ref<{ date: string; features: SerpFeature[] }[]>([]);
   const serpFeaturesLoading = ref(false);
 
-  const fetchSerpFeaturesHistory = async () => {
-    if (!search.keyword) return;
-    serpFeaturesLoading.value = true;
-    const { history } = await $axios.$get(`/api/keyword/serp-features-history`, {
-      params: {
-        keyword: search.keyword,
-      },
+  const fetchSerpFeaturesHistory = () =>
+    withLoading(serpFeaturesLoading, async () => {
+      if (!search.keyword) return;
+      const { history } = await $axios.$get(`/api/keyword/serp-features-history`, {
+        params: {
+          keyword: search.keyword,
+        },
+      });
+      serpFeaturesHistoryData.value = history;
     });
-    serpFeaturesHistoryData.value = history;
-    serpFeaturesLoading.value = false;
-  };
 
   const heatmapData = computed(() => {
     if (serpFeaturesHistoryData.value.length === 0) return { date: [], features: [] };

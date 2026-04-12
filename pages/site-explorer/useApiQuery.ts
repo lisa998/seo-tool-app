@@ -1,4 +1,4 @@
-import { computed, reactive, ref, toRef, useContext, watch } from '@nuxtjs/composition-api';
+import { computed, reactive, Ref, ref, toRef, useContext, watch } from '@nuxtjs/composition-api';
 import useRouteQuery from '~/composables/useRouteQuery';
 import withLoading from '~/utils/withLoading';
 import { BacklinksApiDto, backlinksMapper, BacklinksViewModel } from '~/mappers/site-explorer/backlinks.mapper';
@@ -45,7 +45,7 @@ type ViewModelMap = {
 
 type Mapper = { [K in LinkAnalysisKey]: (dto: ApiDtoMap[K]) => ViewModelMap[K] };
 
-export default function () {
+export default function (domain: Ref<string>) {
   const defaultLinkAnalysisMap = (defaultValue: any) =>
     linkAnalysisKeys.reduce(
       (obj, k) => {
@@ -96,8 +96,9 @@ export default function () {
             delete queryParams[k];
           }
         });
+        if (!domain?.value) return;
         const { data, pagination } = await $axios.$get<ApiResp<K>>(`/api/site-explorer/${key}`, {
-          params: { domain: 'mysite.com', ...queryParams },
+          params: { domain: domain.value, ...queryParams },
         });
         dataObject[key] = {
           data: data.map((d) => mapper[key](d)),

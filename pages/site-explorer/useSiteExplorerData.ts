@@ -1,4 +1,4 @@
-import { ref, useContext } from '@nuxtjs/composition-api';
+import { Ref, ref, useContext } from '@nuxtjs/composition-api';
 import withLoading from '~/utils/withLoading';
 
 const Metrics = ['domainRating', 'backlinks', 'referringDomains', 'organicTraffic'] as const;
@@ -17,15 +17,16 @@ interface OverviewItem {
   sparklines: { x: number; y: number }[];
 }
 
-export default function () {
+export default function (domain: Ref<string>) {
   const { $axios } = useContext();
 
   const overviewData = ref<OverviewItem[]>([]);
   const overviewLoading = ref<boolean>(false);
 
   const fetchOverview = async () => {
+    if (!domain?.value) return;
     const data = await $axios.$get<FetchData>(`/api/site-explorer/overview`, {
-      params: { domain: 'mysite.com' },
+      params: { domain: domain?.value },
     });
     overviewData.value = [
       {

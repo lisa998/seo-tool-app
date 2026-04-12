@@ -1,7 +1,18 @@
 <template>
   <div class="grid gap-8">
     <common-card class="flex gap-4">
-      <el-input v-model="targetDomain" placeholder="輸入目標網址 (domain / URL / prefix)" />
+      <el-autocomplete
+        v-model="targetDomain"
+        :fetch-suggestions="suggestions"
+        :trigger-on-focus="true"
+        class="w-full"
+        placeholder="輸入目標網址 (domain / URL / prefix)"
+        @select="handleSelect"
+      >
+        <template v-slot="{ item }">
+          <p>{{ item }}</p>
+        </template>
+      </el-autocomplete>
       <el-button class="w-[120px]" type="primary" @click="search">分析</el-button>
     </common-card>
     <div class="flex gap-4 h-[184px]">
@@ -90,6 +101,7 @@ import useSiteExplorerData from '~/pages/site-explorer/useSiteExplorerData';
 import useApiQuery, { type LinkAnalysisKey } from '~/pages/site-explorer/useApiQuery';
 import {
   columnConfigMap,
+  exampleDomain,
   gridTemplateMap,
   tabConfig,
   type TabConfigItem,
@@ -103,8 +115,8 @@ import TableSkeleton from '~/components/common/TableSkeleton.vue';
 const tabConfigEntries = Object.entries(tabConfig) as [LinkAnalysisKey, TabConfigItem][];
 
 const targetDomain = ref('');
-const { queryObject, activeTab, dataObject, fetchTableFuncArray } = useApiQuery();
-const { fetchOverviewWithLoading, overviewData, overviewLoading } = useSiteExplorerData();
+const { queryObject, activeTab, dataObject, fetchTableFuncArray } = useApiQuery(targetDomain);
+const { fetchOverviewWithLoading, overviewData, overviewLoading } = useSiteExplorerData(targetDomain);
 
 onMounted(async () => {
   await fetchOverviewWithLoading();
@@ -125,6 +137,13 @@ const virtualTable = computed(() => {
 });
 
 const virtualScrollRowHeight = computed(() => virtualScrollRowHeightMap[activeTab.value]);
+const suggestions = (value: string, cb: (d: string[]) => null) => {
+  cb(exampleDomain);
+};
+
+const handleSelect = (item: string) => {
+  targetDomain.value = item;
+};
 </script>
 
 <style></style>

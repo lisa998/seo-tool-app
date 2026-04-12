@@ -46,16 +46,16 @@ type ViewModelMap = {
 type Mapper = { [K in LinkAnalysisKey]: (dto: ApiDtoMap[K]) => ViewModelMap[K] };
 
 export default function (domain: Ref<string>) {
-  const defaultLinkAnalysisMap = (defaultValue: any) =>
+  const defaultLinkAnalysisMap = (defaultFactory: () => any) =>
     linkAnalysisKeys.reduce(
       (obj, k) => {
-        obj[k] = defaultValue;
+        obj[k] = defaultFactory();
         return obj;
       },
       {} as Record<LinkAnalysisKey, any>,
     );
 
-  const queryObject = reactive<Record<LinkAnalysisKey, Query>>(defaultLinkAnalysisMap({}));
+  const queryObject = reactive<Record<LinkAnalysisKey, Query>>(defaultLinkAnalysisMap(() => ({})));
   const activeTab = ref<LinkAnalysisKey>('backlinks');
   const currentQuery = computed(() => {
     const currentTab = activeTab.value;
@@ -72,12 +72,12 @@ export default function (domain: Ref<string>) {
   }
 
   const dataObject = reactive<Record<LinkAnalysisKey, any>>(
-    defaultLinkAnalysisMap({
+    defaultLinkAnalysisMap(() => ({
       data: [],
       pagination: {},
-    }),
+    })),
   );
-  const loadingStatus = reactive<Record<LinkAnalysisKey, boolean>>(defaultLinkAnalysisMap(false));
+  const loadingStatus = reactive<Record<LinkAnalysisKey, boolean>>(defaultLinkAnalysisMap(() => false));
 
   const { $axios } = useContext();
   const mapper: Mapper = {

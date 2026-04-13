@@ -1,6 +1,6 @@
-import { reactive } from '@nuxtjs/composition-api';
-import useAutoCompleted from '~/composables/useAutoCompleted';
+import { computed, reactive, watch } from '@nuxtjs/composition-api';
 import useRouteQuery from '~/composables/useRouteQuery';
+import useDebouncedAbortableFetch from '~/composables/useDebouncedAbortableFetch';
 
 interface Suggestions {
   keyword: string;
@@ -21,11 +21,29 @@ export default function () {
     search.keyword = defaultQuery.keyword;
   }
 
-  const querySearch = async (query: string, cb: (d: Partial<Suggestions>[]) => null) => {
+  const fetchAutoComplete = async (query: string, signal: AbortSignal) => {
     const url = `/api/keyword/autocomplete?q=${query}`;
-    const { data } = await useAutoCompleted(url);
-    const suggestions = data.value?.suggestions ?? [];
-    cb(suggestions.length ? suggestions : [{ keyword: '查無相關結果/請輸入兩個字以上', disabled: true }]);
+    const data = await fetch(url, { signal, headers: { Authorization: `Bearer token-1234567890` } });
+    if (!data.ok) {
+      throw new Error(`Error fetching autocomplete: ${data.statusText}`);
+    }
+    return await data.json();
+  };
+
+  const { data, execute } = useDebouncedAbortableFetch(fetchAutoComplete, 500);
+  const suggestions = computed(() => data.value?.suggestions ?? []);
+
+  let pendingCb: ((d: Partial<Suggestions>[]) => void) | null = null;
+
+  watch(suggestions, (val) => {
+    if (!pendingCb) return;
+    pendingCb(val.length ? val : [{ keyword: '查無相關結果/請輸入兩個字以上', disabled: true }]);
+    pendingCb = null;
+  });
+
+  const querySearch = (query: string, cb: (d: Partial<Suggestions>[]) => void) => {
+    pendingCb = cb;
+    execute(query);
   };
 
   const handleSelect = (item: Suggestions) => {

@@ -1,6 +1,27 @@
 <script lang="ts" setup>
-import { computed } from '@nuxtjs/composition-api';
-import { axisLabelStyle, axisTitleStyle, chartColors, chartTitleStyle, tooltipTheme } from './chartTheme';
+import { computed, PropType } from '@nuxtjs/composition-api';
+import {
+  axisLabelStyle,
+  axisTitleStyle,
+  chartColors,
+  chartLegendStyle,
+  chartTitleStyle,
+  tooltipTheme,
+  withOpacity,
+} from './chartTheme';
+
+interface SplineSeries {
+  name: string;
+  data: Array<number | [number, number]>;
+  color?: string;
+  yAxis?: number;
+}
+
+interface SplineYAxis {
+  title?: string;
+  opposite?: boolean;
+  lineColor?: string;
+}
 
 const props = defineProps({
   title: {
@@ -11,12 +32,93 @@ const props = defineProps({
     type: Number,
     default: 300,
   },
+  data: {
+    type: Array as PropType<SplineSeries[]>,
+    default: () => [
+      {
+        name: 'new',
+        data: [
+          [0, 15],
+          [10, -50],
+          [20, -56.5],
+          [30, -46.5],
+          [40, -22.1],
+          [50, -2.5],
+          [60, -27.7],
+          [70, -55.7],
+          [80, -76.5],
+        ],
+      },
+      {
+        name: 'lost',
+        data: [
+          [0, 15],
+          [10, 50],
+          [20, 56.5],
+          [30, 46.5],
+          [40, 22.1],
+          [50, 2.5],
+          [60, 27.7],
+          [70, -55.7],
+          [80, 76.5],
+        ],
+      },
+    ],
+  },
+  xAxisCategories: {
+    type: Array as PropType<string[]>,
+    default: () => [],
+  },
+  xAxisTitle: {
+    type: String,
+    default: '',
+  },
+  yAxisTitle: {
+    type: String,
+    default: 'Referring domains',
+  },
+  yAxes: {
+    type: Array as PropType<SplineYAxis[]>,
+    default: () => [],
+  },
+});
+
+const series = computed(() => {
+  const colorSet = [
+    chartColors.primaryActive,
+    chartColors.success,
+    chartColors.danger,
+    chartColors.accent,
+    chartColors.primary,
+  ];
+
+  return props.data.map(({ name, data, color, yAxis }, i) => ({
+    name,
+    color: color ?? colorSet[i % colorSet.length],
+    data,
+    yAxis: yAxis ?? 0,
+  }));
+});
+
+const yAxisOptions = computed(() => {
+  const axes = props.yAxes.length ? props.yAxes : [{ title: props.yAxisTitle }];
+
+  return axes.map((axis, index) => ({
+    gridLineColor: index === 0 ? chartColors.dividerSoft : 'transparent',
+    title: {
+      text: axis.title || null,
+      ...axisTitleStyle,
+    },
+    labels: axisLabelStyle,
+    lineWidth: 2,
+    lineColor: axis.lineColor ?? (axis.opposite ? chartColors.danger : chartColors.primaryHover),
+    opposite: axis.opposite ?? false,
+  }));
 });
 
 const options = computed(() => ({
   chart: {
     type: 'spline',
-    inverted: true,
     height: props.height,
     backgroundColor: 'transparent',
   },
@@ -26,47 +128,28 @@ const options = computed(() => ({
   },
 
   xAxis: {
-    reversed: false,
+    ...(props.xAxisCategories.length ? { categories: props.xAxisCategories } : {}),
     lineColor: chartColors.divider,
     tickColor: chartColors.divider,
     title: {
-      enabled: true,
-      text: 'xAxis',
+      text: props.xAxisTitle || null,
       ...axisTitleStyle,
     },
-    labels: {
-      format: '{value} km',
-      ...axisLabelStyle,
-    },
-    accessibility: {
-      rangeDescription: 'Range: 0 to 80 km.',
-    },
-    maxPadding: 0.05,
-    showLastLabel: true,
+    labels: axisLabelStyle,
   },
-  yAxis: {
-    gridLineColor: chartColors.dividerSoft,
-    title: {
-      text: 'Temperature',
-      ...axisTitleStyle,
-    },
-    labels: {
-      format: '{value}°',
-      ...axisLabelStyle,
-    },
-    accessibility: {
-      rangeDescription: 'Range: -90°C to 20°C.',
-    },
-    lineWidth: 2,
-    lineColor: chartColors.primaryHover,
-  },
+  yAxis: yAxisOptions.value,
   legend: {
-    enabled: false,
+    enabled: props.data.length > 1,
+    align: 'left',
+    verticalAlign: 'top',
+    itemStyle: chartLegendStyle,
+    backgroundColor: withOpacity(chartColors.surfaceSoft, 0.88),
   },
   tooltip: {
     ...tooltipTheme,
-    headerFormat: '<b>{series.name}</b><br/>',
-    pointFormat: '{point.x} km: {point.y}°C',
+    shared: true,
+    headerFormat: '<b>{point.key}</b><br/>',
+    pointFormat: '{series.name}: {point.y}<br/>',
   },
   plotOptions: {
     spline: {
@@ -76,23 +159,7 @@ const options = computed(() => ({
       },
     },
   },
-  series: [
-    {
-      name: 'Temperature',
-      color: chartColors.primaryActive,
-      data: [
-        [0, 15],
-        [10, -50],
-        [20, -56.5],
-        [30, -46.5],
-        [40, -22.1],
-        [50, -2.5],
-        [60, -27.7],
-        [70, -55.7],
-        [80, -76.5],
-      ],
-    },
-  ],
+  series: series.value,
 }));
 </script>
 

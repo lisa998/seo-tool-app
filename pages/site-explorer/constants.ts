@@ -198,5 +198,3 @@ export const virtualScrollRowHeightMap = {
   anchors: 39,
   'broken-links': 59,
 };
-
-export const exampleDomain = ['mysite.com', 'competitor-a.com', 'competitor-b.com', 'competitor-c.com'];

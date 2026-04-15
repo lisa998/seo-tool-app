@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed } from '@nuxtjs/composition-api';
+import { computed, PropType } from '@nuxtjs/composition-api';
 import { chartColors, chartLegendStyle, chartPalette, chartTitleStyle, tooltipTheme } from './chartTheme';
 
 const props = defineProps({
@@ -10,6 +10,31 @@ const props = defineProps({
   height: {
     type: Number,
     default: 300,
+  },
+  data: {
+    type: Array as PropType<Array<{ name: string; y: number }>>,
+    default: () => [
+      {
+        name: 'Nitrogen',
+        y: 78,
+      },
+      {
+        name: 'Oxygen',
+        y: 20.9,
+      },
+      {
+        name: 'Other gases',
+        y: 1.1,
+      },
+    ],
+  },
+  seriesName: {
+    type: String,
+    default: 'Percentage',
+  },
+  valueSuffix: {
+    type: String,
+    default: '%',
   },
 });
 
@@ -29,7 +54,7 @@ const options = computed(() => ({
   },
   tooltip: {
     ...tooltipTheme,
-    valueSuffix: '%',
+    pointFormat: `<span style="color:{point.color}">\u25cf</span> {point.name}: <b>{point.y}${props.valueSuffix}</b><br/>`,
   },
   plotOptions: {
     pie: {
@@ -39,7 +64,7 @@ const options = computed(() => ({
       borderWidth: 3,
       dataLabels: {
         enabled: true,
-        format: '{point.name}: {y} %',
+        format: `{point.name}: {y}${props.valueSuffix}`,
         style: {
           color: chartColors.text,
           fontWeight: '500',
@@ -51,23 +76,10 @@ const options = computed(() => ({
   },
   series: [
     {
-      name: 'Percentage',
+      name: props.seriesName,
       colorByPoint: true,
       innerSize: '75%',
-      data: [
-        {
-          name: 'Nitrogen',
-          y: 78,
-        },
-        {
-          name: 'Oxygen',
-          y: 20.9,
-        },
-        {
-          name: 'Other gases',
-          y: 1.1,
-        },
-      ],
+      data: props.data,
     },
   ],
 }));

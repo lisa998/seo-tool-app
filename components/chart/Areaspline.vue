@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed } from '@nuxtjs/composition-api';
+import { computed, PropType } from '@nuxtjs/composition-api';
 import {
   axisLabelStyle,
   axisTitleStyle,
@@ -23,6 +23,41 @@ const props = defineProps({
     type: Number,
     default: 300,
   },
+  data: {
+    type: Array as PropType<{ name: string; data: number[] }[]>,
+    default: () => [
+      {
+        name: 'Moose',
+        data: [
+          38000, 37300, 37892, 38564, 36770, 36026, 34978, 35657, 35620, 35971, 36409, 36435, 34643, 34956, 33199,
+          31136, 30835, 31611, 30666, 30319, 31766, 29278, 27487, 26007,
+        ],
+      },
+      {
+        name: 'Deer',
+        data: [
+          22534, 23599, 24533, 25195, 25896, 27635, 29173, 32646, 35686, 37709, 39143, 36829, 35031, 36202, 35140,
+          33718, 37773, 42556, 43820, 46445, 50048, 52804, 49317, 52490,
+        ],
+      },
+    ],
+  },
+  xAxisCategories: {
+    type: Array<String>,
+    default: () => [],
+  },
+});
+
+const series = computed(() => {
+  const colorSet = [chartColors.primary, chartColors.accent, chartColors.text];
+  console.log(props.data);
+  return props.data.map(({ name, data }, i) => ({
+    name,
+    color: colorSet[i],
+    lineColor: colorSet[i],
+    fillColor: withOpacity(colorSet[i], 0.2),
+    data,
+  }));
 });
 
 const options = computed(() => ({
@@ -40,8 +75,8 @@ const options = computed(() => ({
     layout: 'vertical',
     align: 'left',
     verticalAlign: 'top',
-    x: 120,
-    y: 70,
+    x: 80,
+    y: 20,
     floating: true,
     borderWidth: 1,
     borderColor: chartColors.divider,
@@ -49,16 +84,10 @@ const options = computed(() => ({
     itemStyle: chartLegendStyle,
   },
   xAxis: {
+    categories: props.xAxisCategories,
     lineColor: chartColors.divider,
     tickColor: chartColors.divider,
     labels: axisLabelStyle,
-    plotBands: [
-      {
-        from: 2020,
-        to: 2023,
-        color: withOpacity(chartColors.primary, 0.14),
-      },
-    ],
   },
   yAxis: {
     gridLineColor: chartColors.dividerSoft,
@@ -71,41 +100,17 @@ const options = computed(() => ({
   tooltip: {
     ...tooltipTheme,
     shared: true,
-    headerFormat: `<b>${props.hoverText ? `${props.hoverText} ` : ''}{point.x}</b><br>`,
+    headerFormat: `<b>${props.hoverText ? `${props.hoverText} ` : ''}{point.key}</b><br>`,
   },
   credits: {
     enabled: false,
   },
   plotOptions: {
-    series: {
-      pointStart: 2000,
-    },
     areaspline: {
       fillOpacity: 1,
     },
   },
-  series: [
-    {
-      name: 'Moose',
-      color: chartColors.primary,
-      lineColor: chartColors.primary,
-      fillColor: withOpacity(chartColors.primary, 0.24),
-      data: [
-        38000, 37300, 37892, 38564, 36770, 36026, 34978, 35657, 35620, 35971, 36409, 36435, 34643, 34956, 33199, 31136,
-        30835, 31611, 30666, 30319, 31766, 29278, 27487, 26007,
-      ],
-    },
-    {
-      name: 'Deer',
-      color: chartColors.accent,
-      lineColor: chartColors.accent,
-      fillColor: withOpacity(chartColors.accent, 0.18),
-      data: [
-        22534, 23599, 24533, 25195, 25896, 27635, 29173, 32646, 35686, 37709, 39143, 36829, 35031, 36202, 35140, 33718,
-        37773, 42556, 43820, 46445, 50048, 52804, 49317, 52490,
-      ],
-    },
-  ],
+  series: series.value,
 }));
 </script>
 

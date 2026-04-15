@@ -91,7 +91,7 @@ import useOverview, { metricEntries } from '~/pages/keyword-explorer/useOverview
 import Bar from '~/components/chart/Bar.vue';
 import Heatmap from '~/components/chart/Heatmap.vue';
 import useSerpRanking from '~/pages/keyword-explorer/useSerpRanking';
-import { nextTick, onMounted, useFetch } from '@nuxtjs/composition-api';
+import { onMounted, useFetch } from '@nuxtjs/composition-api';
 import Table from '~/components/common/Table.vue';
 import useVolumeTrend from '~/pages/keyword-explorer/useVolumeTrend';
 import useSerpFeaturesHistory from '~/pages/keyword-explorer/useSerpFeaturesHistory';
@@ -120,8 +120,6 @@ onMounted(async () => {
 
 const searchAction = async () => {
   await Promise.allSettled([fetchOverview(), fetchSerpRanking(), fetchVolumeTrend(), fetchSerpFeaturesHistory()]);
-  await nextTick();
-  window.dispatchEvent(new Event('resize'));
 };
 
 const columnConfig = [

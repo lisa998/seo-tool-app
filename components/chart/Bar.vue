@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { computed, PropType } from '@nuxtjs/composition-api';
 import { axisLabelStyle, chartColors, chartTitleStyle, getBarSeriesTheme, tooltipTheme } from './chartTheme';
+import { formatCompactNumber } from '~/utils/formatCompactNumber';
 
 const props = defineProps({
   title: {
@@ -34,9 +35,14 @@ const props = defineProps({
     type: String,
     default: '',
   },
+  compactValues: {
+    type: Boolean,
+    default: true,
+  },
 });
 
 const barSeriesTheme = computed(() => getBarSeriesTheme(props.title));
+const formatValue = (value: number) => (props.compactValues ? formatCompactNumber(value, 1) : `${value}`);
 
 const options = computed(() => ({
   chart: {
@@ -72,6 +78,9 @@ const options = computed(() => ({
     labels: {
       overflow: 'justify',
       ...axisLabelStyle,
+      formatter(this: { value: number }) {
+        return formatValue(this.value);
+      },
     },
   },
   plotOptions: {
@@ -80,6 +89,9 @@ const options = computed(() => ({
       borderRadius: 4,
       dataLabels: {
         enabled: true,
+        formatter(this: { y: number }): string {
+          return formatValue(this.y);
+        },
         style: {
           color: chartColors.text,
           fontWeight: '600',
@@ -91,6 +103,9 @@ const options = computed(() => ({
   tooltip: {
     ...tooltipTheme,
     stickOnContact: true,
+    pointFormatter(this: { category: string; color: string; series: { name: string }; y: number }) {
+      return `<span style="color:${this.color}">\u25cf</span> ${this.series.name || this.category}: <b>${formatValue(this.y)}</b><br/>`;
+    },
   },
   legend: {
     enabled: false,

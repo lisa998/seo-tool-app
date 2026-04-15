@@ -1,5 +1,6 @@
 <script lang="ts">
 import { computed, defineComponent } from '@nuxtjs/composition-api';
+import { formatCompactNumber } from '~/utils/formatCompactNumber';
 
 export default defineComponent({
   props: {
@@ -13,12 +14,7 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const formatCompactNumber = () => {
-      return new Intl.NumberFormat('en', {
-        notation: 'compact',
-        maximumFractionDigits: props.decimals,
-      }).format(props.value);
-    };
+    const numberText = computed(() => formatCompactNumber(props.value, props.decimals));
     const textColorClass = computed(() => ({
       'text-accent': props.value < 0,
       'text-success': props.value > 0,
@@ -35,6 +31,7 @@ export default defineComponent({
       formatCompactNumber,
       textColorClass,
       iconClass,
+      numberText,
     };
   },
 });
@@ -43,7 +40,7 @@ export default defineComponent({
 <template>
   <div class="flex gap-1 items-center">
     <i :class="{ ...iconClass, ...textColorClass }"></i>
-    <p v-if="formatCompactNumber() !== '0'" :class="textColorClass">{{ formatCompactNumber() }}</p>
+    <p v-if="numberText !== '0'" :class="textColorClass">{{ numberText }}</p>
   </div>
 </template>
 

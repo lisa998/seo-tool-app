@@ -1,18 +1,7 @@
 <template>
   <div class="grid gap-8">
     <common-card class="flex gap-4">
-      <el-autocomplete
-        v-model="targetDomain"
-        :fetch-suggestions="suggestions"
-        :trigger-on-focus="true"
-        class="w-full"
-        placeholder="輸入目標網址 (domain / URL / prefix)"
-        @select="handleSelect"
-      >
-        <template v-slot="{ item }">
-          <p>{{ item }}</p>
-        </template>
-      </el-autocomplete>
+      <common-domain-autocomplete v-model="targetDomain" />
       <el-button class="w-[120px]" type="primary" @click="search">分析</el-button>
     </common-card>
     <div class="flex gap-4 h-[184px]">
@@ -95,13 +84,12 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, nextTick, onMounted, ref } from '@nuxtjs/composition-api';
+import { computed, onMounted, ref } from '@nuxtjs/composition-api';
 import SimplifiedLineGraph from '~/components/chart/SimplifiedLineGraph.vue';
 import useSiteExplorerData from '~/pages/site-explorer/useSiteExplorerData';
 import useApiQuery, { type LinkAnalysisKey } from '~/pages/site-explorer/useApiQuery';
 import {
   columnConfigMap,
-  exampleDomain,
   gridTemplateMap,
   tabConfig,
   type TabConfigItem,
@@ -125,8 +113,6 @@ onMounted(async () => {
 const search = async () => {
   await fetchOverviewWithLoading();
   await Promise.allSettled(fetchTableFuncArray.map((fn) => fn()));
-  await nextTick();
-  window.dispatchEvent(new Event('resize'));
 };
 const columnConfig = computed(() => columnConfigMap[activeTab.value]);
 const gridTemplate = computed(() => gridTemplateMap[activeTab.value]);
@@ -137,11 +123,4 @@ const virtualTable = computed(() => {
 });
 
 const virtualScrollRowHeight = computed(() => virtualScrollRowHeightMap[activeTab.value]);
-const suggestions = (value: string, cb: (d: string[]) => null) => {
-  cb(exampleDomain);
-};
-
-const handleSelect = (item: string) => {
-  targetDomain.value = item;
-};
 </script>

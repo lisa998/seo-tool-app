@@ -14,20 +14,29 @@ interface TrafficByCountryResp {
 
 export default function (targetDomain: Ref<string>) {
   const trafficByCountryLoading = ref(false);
+  const trafficByCountryError = ref<unknown>(null);
   const trafficByCountryData = ref<TrafficByCountryResp | null>(null);
 
   const { $axios } = useContext();
 
   const fetchTrafficByCountry = () =>
-    withLoading(trafficByCountryLoading, async () => {
-      if (!targetDomain?.value) return;
+    withLoading(
+      trafficByCountryLoading,
+      async () => {
+        if (!targetDomain?.value) return;
+        trafficByCountryData.value = null;
 
-      trafficByCountryData.value = await $axios.$get<TrafficByCountryResp>(`/api/domain-overview/traffic-by-country`, {
-        params: {
-          domain: targetDomain.value,
-        },
-      });
-    });
+        trafficByCountryData.value = await $axios.$get<TrafficByCountryResp>(
+          `/api/domain-overview/traffic-by-country`,
+          {
+            params: {
+              domain: targetDomain.value,
+            },
+          },
+        );
+      },
+      trafficByCountryError,
+    );
 
   const trafficByCountryChartData = computed(() => {
     const countries = [...(trafficByCountryData.value?.countries ?? [])].sort((a, b) => b.traffic - a.traffic);
@@ -39,5 +48,11 @@ export default function (targetDomain: Ref<string>) {
     };
   });
 
-  return { fetchTrafficByCountry, trafficByCountryLoading, trafficByCountryData, trafficByCountryChartData };
+  return {
+    fetchTrafficByCountry,
+    trafficByCountryLoading,
+    trafficByCountryError,
+    trafficByCountryData,
+    trafficByCountryChartData,
+  };
 }

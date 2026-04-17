@@ -23,35 +23,41 @@ interface SummaryItem {
 
 export default function (targetDomain: Ref<string>) {
   const summaryLoading = ref(false);
+  const summaryError = ref<unknown>(null);
   const summaryData = ref<SummaryItem[]>([]);
 
   const { $axios } = useContext();
 
   const fetchSummary = () =>
-    withLoading(summaryLoading, async () => {
-      if (!targetDomain?.value) return;
+    withLoading(
+      summaryLoading,
+      async () => {
+        if (!targetDomain?.value) return;
+        summaryData.value = [];
 
-      const data = await $axios.$get<SummaryResp>(`/api/domain-overview/summary`, {
-        params: { domain: targetDomain.value },
-      });
-      summaryData.value = [
-        {
-          title: 'Ahrefs Rank',
-          metrics: '#' + data?.ahrefsRank.toLocaleString(),
-          variation: data?.ahrefsRankDelta || 0,
-        },
-        {
-          title: 'DR',
-          metrics: data?.domainRating || 0,
-          variation: data?.domainRatingDelta || 0,
-        },
-        {
-          title: '反向連結',
-          metrics: formatCompactNumber(data?.backlinks || 0, 1),
-          variation: data?.backlinksDelta || 0,
-        },
-      ];
-    });
+        const data = await $axios.$get<SummaryResp>(`/api/domain-overview/summary`, {
+          params: { domain: targetDomain.value },
+        });
+        summaryData.value = [
+          {
+            title: 'Ahrefs Rank',
+            metrics: '#' + data?.ahrefsRank.toLocaleString(),
+            variation: data?.ahrefsRankDelta || 0,
+          },
+          {
+            title: 'DR',
+            metrics: data?.domainRating || 0,
+            variation: data?.domainRatingDelta || 0,
+          },
+          {
+            title: '反向連結',
+            metrics: formatCompactNumber(data?.backlinks || 0, 1),
+            variation: data?.backlinksDelta || 0,
+          },
+        ];
+      },
+      summaryError,
+    );
 
-  return { fetchSummary, summaryLoading, summaryData };
+  return { fetchSummary, summaryLoading, summaryError, summaryData };
 }

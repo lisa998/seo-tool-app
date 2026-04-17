@@ -14,6 +14,7 @@
           </div>
         </common-card>
       </div>
+      <error-img v-else-if="summaryError" />
       <not-search-yet v-else-if="summaryData.length === 0" text="等待搜尋網址" />
       <div v-else class="grid grid-cols-3 gap-4">
         <common-card v-for="data in summaryData" :key="data.title" class="flex flex-col items-center gap-2">
@@ -38,6 +39,7 @@
     <div class="grid grid-cols-2 gap-4">
       <common-card class="h-[316px]">
         <chart-skeleton v-if="trafficTrendLoading" />
+        <error-img v-else-if="trafficTrendError" />
         <not-search-yet v-else-if="trafficTrendChartData.xAxisCategories.length === 0" />
         <Areaspline
           v-else
@@ -48,6 +50,7 @@
       </common-card>
       <common-card class="h-[316px]">
         <chart-skeleton v-if="referringDomainsGrowthLoading" />
+        <error-img v-else-if="referringDomainsGrowthError" />
         <not-search-yet v-else-if="referringDomainsGrowthChartData.xAxisCategories.length === 0" />
         <spline
           v-else
@@ -59,6 +62,7 @@
       </common-card>
       <common-card class="h-[376px]">
         <chart-skeleton v-if="trafficByCountryLoading" />
+        <error-img v-else-if="trafficByCountryError" />
         <not-search-yet v-else-if="trafficByCountryChartData.categories.length === 0" />
         <bar
           v-else
@@ -71,6 +75,7 @@
       </common-card>
       <common-card class="h-[376px]">
         <chart-skeleton v-if="topKeywordsLoading" />
+        <error-img v-else-if="topKeywordsError" />
         <not-search-yet v-else-if="topKeywordsChartData.categories.length === 0" />
         <bar
           v-else
@@ -85,6 +90,7 @@
     <div ref="lastChartsRef" class="grid grid-cols-[1fr_2fr] gap-4">
       <common-card class="h-[336px]">
         <chart-skeleton v-if="linkTypeDistributionLoading" />
+        <error-img v-else-if="linkTypeDistributionError" />
         <not-search-yet v-else-if="linkTypeDistributionChartData.data.length === 0" />
         <donut-chart
           v-else
@@ -96,6 +102,7 @@
       </common-card>
       <common-card class="h-[336px]">
         <chart-skeleton v-if="backlinksNewLostLoading" />
+        <error-img v-else-if="backlinksNewLostError" />
         <not-search-yet v-else-if="backlinksNewLostChartData.categories.length === 0" />
         <column-chart
           v-else
@@ -111,7 +118,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, onMounted, ref } from '@nuxtjs/composition-api';
+import { computed, onBeforeUnmount, onMounted, ref } from '@nuxtjs/composition-api';
 import FormatNumber from '~/components/common/FormatNumber.vue';
 import Areaspline from '~/components/chart/Areaspline.vue';
 import Spline from '~/components/chart/Spline.vue';
@@ -120,6 +127,7 @@ import DonutChart from '~/components/chart/DonutChart.vue';
 import ColumnChart from '~/components/chart/ColumnChart.vue';
 import useSummary from '~/pages/domain-overview/useSummary';
 import NotSearchYet from '~/components/common/NotSearchYet.vue';
+import ErrorImg from '~/components/common/ErrorImg.vue';
 import useTrafficTrend from '~/pages/domain-overview/useTrafficTrend';
 import ChartSkeleton from '~/components/chart/ChartSkeleton.vue';
 import useReferringDomainsGrowth from '~/pages/domain-overview/useReferringDomainsGrowth';
@@ -128,6 +136,7 @@ import useTopKeywords from '~/pages/domain-overview/useTopKeywords';
 import useLinkTypeDistribution from '~/pages/domain-overview/useLinkTypeDistribution';
 import useBacklinksNewLost from '~/pages/domain-overview/useBacklinksNewLost';
 import useLazyFetchOnVisible from '~/composables/useLazyFetchOnVisible';
+import { clearAllCache } from '~/composables/useCachedFetch';
 
 const targetDomain = ref('');
 
@@ -142,19 +151,32 @@ const timeButton = [
 const activeTime = ref('6m');
 const topKeywordsLimit = ref(8);
 
-const { fetchSummary, summaryLoading, summaryData } = useSummary(targetDomain);
+const { fetchSummary, summaryLoading, summaryError, summaryData } = useSummary(targetDomain);
 
-const { fetchTrafficTrend, trafficTrendLoading, trafficTrendChartData } = useTrafficTrend(targetDomain, activeTime);
-const { fetchReferringDomainsGrowth, referringDomainsGrowthLoading, referringDomainsGrowthChartData } =
-  useReferringDomainsGrowth(targetDomain, activeTime);
-const { fetchTrafficByCountry, trafficByCountryLoading, trafficByCountryChartData } = useTrafficByCountry(targetDomain);
-const { fetchTopKeywords, topKeywordsLoading, topKeywordsChartData } = useTopKeywords(targetDomain, topKeywordsLimit);
-const { fetchLinkTypeDistribution, linkTypeDistributionLoading, linkTypeDistributionChartData } =
-  useLinkTypeDistribution(targetDomain);
-const { fetchBacklinksNewLost, backlinksNewLostLoading, backlinksNewLostChartData } = useBacklinksNewLost(
+const { fetchTrafficTrend, trafficTrendLoading, trafficTrendError, trafficTrendChartData } = useTrafficTrend(
   targetDomain,
   activeTime,
 );
+const {
+  fetchReferringDomainsGrowth,
+  referringDomainsGrowthLoading,
+  referringDomainsGrowthError,
+  referringDomainsGrowthChartData,
+} = useReferringDomainsGrowth(targetDomain, activeTime);
+const { fetchTrafficByCountry, trafficByCountryLoading, trafficByCountryError, trafficByCountryChartData } =
+  useTrafficByCountry(targetDomain);
+const { fetchTopKeywords, topKeywordsLoading, topKeywordsError, topKeywordsChartData } = useTopKeywords(
+  targetDomain,
+  topKeywordsLimit,
+);
+const {
+  fetchLinkTypeDistribution,
+  linkTypeDistributionLoading,
+  linkTypeDistributionError,
+  linkTypeDistributionChartData,
+} = useLinkTypeDistribution(targetDomain);
+const { fetchBacklinksNewLost, backlinksNewLostLoading, backlinksNewLostError, backlinksNewLostChartData } =
+  useBacklinksNewLost(targetDomain, activeTime);
 
 const isFetching = computed(
   () =>
@@ -203,4 +225,8 @@ const clickTimeBtn = async (value: string) => {
   if (!targetDomain.value) return;
   await Promise.allSettled([fetchTrafficTrend(), fetchReferringDomainsGrowth(), fetchBacklinksNewLost()]);
 };
+
+onBeforeUnmount(() => {
+  clearAllCache();
+});
 </script>

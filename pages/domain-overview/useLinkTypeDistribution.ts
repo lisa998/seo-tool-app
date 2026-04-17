@@ -13,23 +13,29 @@ interface LinkTypeDistributionResp {
 
 export default function (targetDomain: Ref<string>) {
   const linkTypeDistributionLoading = ref(false);
+  const linkTypeDistributionError = ref<unknown>(null);
   const linkTypeDistributionData = ref<LinkTypeDistributionResp | null>(null);
 
   const { $axios } = useContext();
 
   const fetchLinkTypeDistribution = () =>
-    withLoading(linkTypeDistributionLoading, async () => {
-      if (!targetDomain?.value) return;
+    withLoading(
+      linkTypeDistributionLoading,
+      async () => {
+        if (!targetDomain?.value) return;
+        linkTypeDistributionData.value = null;
 
-      linkTypeDistributionData.value = await $axios.$get<LinkTypeDistributionResp>(
-        `/api/domain-overview/link-type-distribution`,
-        {
-          params: {
-            domain: targetDomain.value,
+        linkTypeDistributionData.value = await $axios.$get<LinkTypeDistributionResp>(
+          `/api/domain-overview/link-type-distribution`,
+          {
+            params: {
+              domain: targetDomain.value,
+            },
           },
-        },
-      );
-    });
+        );
+      },
+      linkTypeDistributionError,
+    );
 
   const linkTypeDistributionChartData = computed(() => ({
     data: (linkTypeDistributionData.value?.distribution ?? []).map(({ type, percentage }) => ({
@@ -42,6 +48,7 @@ export default function (targetDomain: Ref<string>) {
   return {
     fetchLinkTypeDistribution,
     linkTypeDistributionLoading,
+    linkTypeDistributionError,
     linkTypeDistributionData,
     linkTypeDistributionChartData,
   };

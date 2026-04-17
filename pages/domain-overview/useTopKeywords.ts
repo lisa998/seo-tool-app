@@ -15,21 +15,27 @@ interface TopKeywordsResp {
 
 export default function (targetDomain: Ref<string>, limit: Ref<number>) {
   const topKeywordsLoading = ref(false);
+  const topKeywordsError = ref<unknown>(null);
   const topKeywordsData = ref<TopKeywordsResp | null>(null);
 
   const { $axios } = useContext();
 
   const fetchTopKeywords = () =>
-    withLoading(topKeywordsLoading, async () => {
-      if (!targetDomain?.value) return;
+    withLoading(
+      topKeywordsLoading,
+      async () => {
+        if (!targetDomain?.value) return;
+        topKeywordsData.value = null;
 
-      topKeywordsData.value = await $axios.$get<TopKeywordsResp>(`/api/domain-overview/top-keywords`, {
-        params: {
-          domain: targetDomain.value,
-          limit: limit.value,
-        },
-      });
-    });
+        topKeywordsData.value = await $axios.$get<TopKeywordsResp>(`/api/domain-overview/top-keywords`, {
+          params: {
+            domain: targetDomain.value,
+            limit: limit.value,
+          },
+        });
+      },
+      topKeywordsError,
+    );
 
   const topKeywordsChartData = computed(() => {
     const keywords = [...(topKeywordsData.value?.keywords ?? [])].sort((a, b) => b.traffic - a.traffic);
@@ -41,5 +47,5 @@ export default function (targetDomain: Ref<string>, limit: Ref<number>) {
     };
   });
 
-  return { fetchTopKeywords, topKeywordsLoading, topKeywordsData, topKeywordsChartData };
+  return { fetchTopKeywords, topKeywordsLoading, topKeywordsError, topKeywordsData, topKeywordsChartData };
 }

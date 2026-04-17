@@ -1,6 +1,7 @@
 import { computed, Ref, ref, useContext } from '@nuxtjs/composition-api';
 import withLoading from '~/utils/withLoading';
 import { chartColors } from '~/components/chart/chartTheme';
+import { executeCache } from '~/composables/useCachedFetch';
 
 interface ReferringDomainsGrowthDataPoint {
   date: string;
@@ -22,24 +23,31 @@ interface Series {
 
 export default function (targetDomain: Ref<string>, activeRange: Ref<string>) {
   const referringDomainsGrowthLoading = ref(false);
+  const referringDomainsGrowthError = ref<unknown>(null);
   const referringDomainsGrowthData = ref<ReferringDomainsGrowthResp | null>(null);
 
   const { $axios } = useContext();
 
   const fetchReferringDomainsGrowth = () =>
-    withLoading(referringDomainsGrowthLoading, async () => {
-      if (!targetDomain?.value) return;
+    withLoading(
+      referringDomainsGrowthLoading,
+      async () => {
+        if (!targetDomain?.value) return;
+        referringDomainsGrowthData.value = null;
 
-      referringDomainsGrowthData.value = await $axios.$get<ReferringDomainsGrowthResp>(
-        `/api/domain-overview/referring-domains-growth`,
-        {
-          params: {
-            domain: targetDomain.value,
-            range: activeRange.value,
-          },
-        },
-      );
-    });
+        referringDomainsGrowthData.value = await executeCache<ReferringDomainsGrowthResp>(
+          `${targetDomain.value}:${activeRange.value}:referringDomainsGrowth`,
+          () =>
+            $axios.$get<ReferringDomainsGrowthResp>(`/api/domain-overview/referring-domains-growth`, {
+              params: {
+                domain: targetDomain.value,
+                range: activeRange.value,
+              },
+            }),
+        );
+      },
+      referringDomainsGrowthError,
+    );
 
   const referringDomainsGrowthChartData = computed(() => {
     const xAxisCategories = [] as string[];
@@ -62,6 +70,7 @@ export default function (targetDomain: Ref<string>, activeRange: Ref<string>) {
   return {
     fetchReferringDomainsGrowth,
     referringDomainsGrowthLoading,
+    referringDomainsGrowthError,
     referringDomainsGrowthData,
     referringDomainsGrowthChartData,
   };

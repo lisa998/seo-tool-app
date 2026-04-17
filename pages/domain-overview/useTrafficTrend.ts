@@ -1,5 +1,6 @@
 import { computed, Ref, ref, useContext } from '@nuxtjs/composition-api';
 import withLoading from '~/utils/withLoading';
+import { executeCache } from '~/composables/useCachedFetch';
 
 interface TrafficTrendDataPoint {
   date: string;
@@ -21,21 +22,31 @@ interface Series {
 
 export default function (targetDomain: Ref<string>, activeRange: Ref<string>) {
   const trafficTrendLoading = ref(false);
+  const trafficTrendError = ref<unknown>(null);
   const trafficTrendData = ref<TrafficTrendResp | null>(null);
 
   const { $axios } = useContext();
 
   const fetchTrafficTrend = () =>
-    withLoading(trafficTrendLoading, async () => {
-      if (!targetDomain?.value) return;
+    withLoading(
+      trafficTrendLoading,
+      async () => {
+        if (!targetDomain?.value) return;
+        trafficTrendData.value = null;
 
-      trafficTrendData.value = await $axios.$get<TrafficTrendResp>(`/api/domain-overview/traffic-trend`, {
-        params: {
-          domain: targetDomain.value,
-          range: activeRange.value,
-        },
-      });
-    });
+        trafficTrendData.value = await executeCache<TrafficTrendResp>(
+          `${targetDomain.value}:${activeRange.value}:trafficTrend`,
+          () =>
+            $axios.$get<TrafficTrendResp>(`/api/domain-overview/traffic-trend`, {
+              params: {
+                domain: targetDomain.value,
+                range: activeRange.value,
+              },
+            }),
+        );
+      },
+      trafficTrendError,
+    );
   const trafficTrendChartData = computed(() => {
     const xAxisCategories = [] as string[];
     const series = [
@@ -52,5 +63,5 @@ export default function (targetDomain: Ref<string>, activeRange: Ref<string>) {
     return { xAxisCategories, series };
   });
 
-  return { fetchTrafficTrend, trafficTrendLoading, trafficTrendData, trafficTrendChartData };
+  return { fetchTrafficTrend, trafficTrendLoading, trafficTrendError, trafficTrendData, trafficTrendChartData };
 }

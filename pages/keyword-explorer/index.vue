@@ -18,17 +18,21 @@
       </el-autocomplete>
       <el-button class="w-[120px]" type="primary" @click="searchAction">搜尋</el-button>
     </common-card>
-    <div class="grid grid-cols-5 gap-4">
-      <common-card v-for="[key, title] in metricEntries" class="grid gap-4">
-        <p class="text-text-secondary text-sm">{{ title }}</p>
-        <p v-if="overviewData?.[key]" class="text-text text-2xl">{{ overviewData?.[key] }}</p>
-        <div v-else class="h-1 w-4 bg-divider text-center justify-self-center"></div>
-      </common-card>
+    <div class="h-[104px]">
+      <error-img v-if="overviewError" />
+      <div v-else class="grid grid-cols-5 gap-4">
+        <common-card v-for="[key, title] in metricEntries" class="grid gap-4">
+          <p class="text-text-secondary text-sm">{{ title }}</p>
+          <p v-if="overviewData?.[key]" class="text-text text-2xl">{{ overviewData?.[key] }}</p>
+          <div v-else class="h-1 w-4 bg-divider text-center justify-self-center"></div>
+        </common-card>
+      </div>
     </div>
     <div class="grid gap-6">
       <div class="grid grid-cols-2 gap-4">
         <common-card class="relative h-[400px]">
           <chart-skeleton v-if="volumeTrendLoading" />
+          <error-img v-else-if="volumeTrendError" />
           <not-search-yet v-else-if="barData.data.length === 0" />
           <bar
             v-else
@@ -41,6 +45,7 @@
         </common-card>
         <common-card class="relative h-[400px]">
           <chart-skeleton v-if="serpFeaturesLoading" />
+          <error-img v-else-if="serpFeaturesError" />
           <not-search-yet v-else-if="heatmapData.features.length === 0" />
           <heatmap
             v-else
@@ -62,6 +67,7 @@
           </el-skeleton>
           <table-skeleton grid-cols="grid-cols-[1fr_6fr_1fr_1fr_2fr_2fr]" />
         </div>
+        <error-img v-else-if="serpRankingError" class="h-[300px]" />
         <not-search-yet v-else-if="tableSerpData.length === 0" />
         <div v-else>
           <h3 class="text-text-secondary mb-2">SERP 排名結果</h3>
@@ -97,17 +103,19 @@ import useVolumeTrend from '~/pages/keyword-explorer/useVolumeTrend';
 import useSerpFeaturesHistory from '~/pages/keyword-explorer/useSerpFeaturesHistory';
 import ChartSkeleton from '~/components/chart/ChartSkeleton.vue';
 import NotSearchYet from '~/components/common/NotSearchYet.vue';
+import ErrorImg from '~/components/common/ErrorImg.vue';
 import TableSkeleton from '~/components/common/TableSkeleton.vue';
 
 const { search, querySearch, handleSelect } = useSearch();
 
-const { overviewData, fetchOverview } = useOverview(search);
+const { overviewData, overviewError, fetchOverview } = useOverview(search);
 
-const { tableSerpData, serpRankingLoading, fetchSerpRanking } = useSerpRanking(search);
+const { tableSerpData, serpRankingLoading, serpRankingError, fetchSerpRanking } = useSerpRanking(search);
 
-const { barData, volumeTrendLoading, fetchVolumeTrend } = useVolumeTrend(search);
+const { barData, volumeTrendLoading, volumeTrendError, fetchVolumeTrend } = useVolumeTrend(search);
 
-const { heatmapData, allSerpFeatures, serpFeaturesLoading, fetchSerpFeaturesHistory } = useSerpFeaturesHistory(search);
+const { heatmapData, allSerpFeatures, serpFeaturesLoading, serpFeaturesError, fetchSerpFeaturesHistory } =
+  useSerpFeaturesHistory(search);
 
 useFetch(async () => {
   await Promise.allSettled([fetchOverview(), fetchSerpRanking()]);

@@ -16,17 +16,23 @@ export default function (search: { keyword: string }) {
   const { $axios } = useContext();
   const serpData = ssrRef<SerpResult[]>([], 'serpData');
   const serpRankingLoading = ref(false);
+  const serpRankingError = ref<unknown>(null);
 
   const fetchSerpRanking = () =>
-    withLoading(serpRankingLoading, async () => {
-      if (!search.keyword) return;
-      const { results } = await $axios.$get(`/api/keyword/serp`, {
-        params: {
-          keyword: search.keyword,
-        },
-      });
-      serpData.value = results;
-    });
+    withLoading(
+      serpRankingLoading,
+      async () => {
+        if (!search.keyword) return;
+        serpData.value = [];
+        const { results } = await $axios.$get(`/api/keyword/serp`, {
+          params: {
+            keyword: search.keyword,
+          },
+        });
+        serpData.value = results;
+      },
+      serpRankingError,
+    );
 
   const tableSerpData = computed(() =>
     serpData.value.map((item) => {
@@ -41,5 +47,5 @@ export default function (search: { keyword: string }) {
     }),
   );
 
-  return { tableSerpData, fetchSerpRanking, serpRankingLoading };
+  return { tableSerpData, fetchSerpRanking, serpRankingLoading, serpRankingError };
 }

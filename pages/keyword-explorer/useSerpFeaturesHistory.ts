@@ -19,17 +19,23 @@ export default function (search: { keyword: string }) {
   const { $axios } = useContext();
   const serpFeaturesHistoryData = ref<{ date: string; features: SerpFeature[] }[]>([]);
   const serpFeaturesLoading = ref(false);
+  const serpFeaturesError = ref<unknown>(null);
 
   const fetchSerpFeaturesHistory = () =>
-    withLoading(serpFeaturesLoading, async () => {
-      if (!search.keyword) return;
-      const { history } = await $axios.$get(`/api/keyword/serp-features-history`, {
-        params: {
-          keyword: search.keyword,
-        },
-      });
-      serpFeaturesHistoryData.value = history;
-    });
+    withLoading(
+      serpFeaturesLoading,
+      async () => {
+        if (!search.keyword) return;
+        serpFeaturesHistoryData.value = [];
+        const { history } = await $axios.$get(`/api/keyword/serp-features-history`, {
+          params: {
+            keyword: search.keyword,
+          },
+        });
+        serpFeaturesHistoryData.value = history;
+      },
+      serpFeaturesError,
+    );
 
   const heatmapData = computed(() => {
     if (serpFeaturesHistoryData.value.length === 0) return { date: [], features: [] };
@@ -52,5 +58,12 @@ export default function (search: { keyword: string }) {
 
   const allSerpFeatures = [...SERP_FEATURES];
 
-  return { serpFeaturesHistoryData, heatmapData, allSerpFeatures, serpFeaturesLoading, fetchSerpFeaturesHistory };
+  return {
+    serpFeaturesHistoryData,
+    heatmapData,
+    allSerpFeatures,
+    serpFeaturesLoading,
+    serpFeaturesError,
+    fetchSerpFeaturesHistory,
+  };
 }

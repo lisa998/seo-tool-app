@@ -15,17 +15,23 @@ export default function (search: { keyword: string }) {
 
   const volumeTrendData = ref<VolumeTrendItem[]>([]);
   const volumeTrendLoading = ref(false);
+  const volumeTrendError = ref<unknown>(null);
 
   const fetchVolumeTrend = () =>
-    withLoading(volumeTrendLoading, async () => {
-      if (!search.keyword) return;
-      const { months } = await $axios.$get<VolumeTrendResp>('/api/keyword/volume-trend', {
-        params: {
-          keyword: search.keyword,
-        },
-      });
-      volumeTrendData.value = months;
-    });
+    withLoading(
+      volumeTrendLoading,
+      async () => {
+        if (!search.keyword) return;
+        volumeTrendData.value = [];
+        const { months } = await $axios.$get<VolumeTrendResp>('/api/keyword/volume-trend', {
+          params: {
+            keyword: search.keyword,
+          },
+        });
+        volumeTrendData.value = months;
+      },
+      volumeTrendError,
+    );
 
   const barData = computed(() => {
     if (volumeTrendData.value.length === 0) return { categories: [], data: [] };
@@ -35,5 +41,5 @@ export default function (search: { keyword: string }) {
     };
   });
 
-  return { barData, fetchVolumeTrend, volumeTrendLoading };
+  return { barData, fetchVolumeTrend, volumeTrendLoading, volumeTrendError };
 }

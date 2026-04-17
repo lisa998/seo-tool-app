@@ -14,6 +14,7 @@
           </div>
         </common-card>
       </template>
+      <error-img v-else-if="overviewError" />
       <not-search-yet v-else-if="overviewData.length === 0" text="等待搜尋網址" />
       <template v-else>
         <common-card v-for="data in overviewData" :key="data.title" class="flex-grow h-full">
@@ -51,7 +52,9 @@
             </el-option>
           </el-select>
         </div>
-        <table-skeleton v-if="dataObject[activeTab]?.data.length === 0" :grid-cols="gridTemplate" />
+        <table-skeleton v-if="loadingStatus[activeTab]" :grid-cols="gridTemplate" />
+        <error-img v-else-if="errorStatus[activeTab]" class="h-[300px]" />
+        <not-search-yet v-else-if="dataObject[activeTab]?.data.length === 0" text="等待搜尋網址" class="h-[300px]" />
         <div v-else class="table-border">
           <virtual-scroll :items-length="dataObject[activeTab]?.data.length" :row-height="virtualScrollRowHeight">
             <template v-slot="{ startIndex, endIndex }">
@@ -97,14 +100,16 @@ import {
 } from '~/pages/site-explorer/constants';
 import Table from '~/components/common/Table.vue';
 import NotSearchYet from '~/components/common/NotSearchYet.vue';
+import ErrorImg from '~/components/common/ErrorImg.vue';
 import VirtualScroll from '~/components/common/VirtualScroll.vue';
 import TableSkeleton from '~/components/common/TableSkeleton.vue';
 
 const tabConfigEntries = Object.entries(tabConfig) as [LinkAnalysisKey, TabConfigItem][];
 
 const targetDomain = ref('');
-const { queryObject, activeTab, dataObject, fetchTableFuncArray } = useApiQuery(targetDomain);
-const { fetchOverviewWithLoading, overviewData, overviewLoading } = useSiteExplorerData(targetDomain);
+const { queryObject, activeTab, dataObject, loadingStatus, errorStatus, fetchTableFuncArray } =
+  useApiQuery(targetDomain);
+const { fetchOverviewWithLoading, overviewData, overviewLoading, overviewError } = useSiteExplorerData(targetDomain);
 
 onMounted(async () => {
   await fetchOverviewWithLoading();

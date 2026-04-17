@@ -22,9 +22,11 @@ export default function (domain: Ref<string>) {
 
   const overviewData = ref<OverviewItem[]>([]);
   const overviewLoading = ref<boolean>(false);
+  const overviewError = ref<unknown>(null);
 
   const fetchOverview = async () => {
     if (!domain?.value) return;
+    overviewData.value = [];
     const data = await $axios.$get<FetchData>(`/api/site-explorer/overview`, {
       params: { domain: domain?.value },
     });
@@ -64,7 +66,7 @@ export default function (domain: Ref<string>) {
     ];
   };
 
-  const fetchOverviewWithLoading = () => withLoading(overviewLoading, fetchOverview);
+  const fetchOverviewWithLoading = () => withLoading(overviewLoading, fetchOverview, overviewError);
 
-  return { fetchOverviewWithLoading, overviewData, overviewLoading };
+  return { fetchOverviewWithLoading, overviewData, overviewLoading, overviewError };
 }

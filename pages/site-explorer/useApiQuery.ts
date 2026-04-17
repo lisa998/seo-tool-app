@@ -78,6 +78,7 @@ export default function (domain: Ref<string>) {
     })),
   );
   const loadingStatus = reactive<Record<LinkAnalysisKey, boolean>>(defaultLinkAnalysisMap(() => false));
+  const errorStatus = reactive<Record<LinkAnalysisKey, unknown>>(defaultLinkAnalysisMap(() => null));
 
   const { $axios } = useContext();
   const mapper: Mapper = {
@@ -89,22 +90,27 @@ export default function (domain: Ref<string>) {
 
   const createFetchTask = <K extends LinkAnalysisKey>(key: K) => {
     return () =>
-      withLoading(toRef(loadingStatus, key), async () => {
-        const queryParams = queryObject[key] || {};
-        Object.entries(queryParams).forEach(([k, v]) => {
-          if (!v) {
-            delete queryParams[k];
-          }
-        });
-        if (!domain?.value) return;
-        const { data, pagination } = await $axios.$get<ApiResp<K>>(`/api/site-explorer/${key}`, {
-          params: { domain: domain.value, ...queryParams },
-        });
-        dataObject[key] = {
-          data: data.map((d) => mapper[key](d)),
-          pagination,
-        };
-      });
+      withLoading(
+        toRef(loadingStatus, key),
+        async () => {
+          const queryParams = queryObject[key] || {};
+          Object.entries(queryParams).forEach(([k, v]) => {
+            if (!v) {
+              delete queryParams[k];
+            }
+          });
+          if (!domain?.value) return;
+          dataObject[key] = { data: [], pagination: {} };
+          const { data, pagination } = await $axios.$get<ApiResp<K>>(`/api/site-explorer/${key}`, {
+            params: { domain: domain.value, ...queryParams },
+          });
+          dataObject[key] = {
+            data: data.map((d) => mapper[key](d)),
+            pagination,
+          };
+        },
+        toRef(errorStatus, key),
+      );
   };
 
   const fetchTableFuncArray = linkAnalysisKeys.map((key) => createFetchTask(key));
@@ -115,5 +121,5 @@ export default function (domain: Ref<string>) {
     await fetchCurrentTask.value();
   });
 
-  return { queryObject, activeTab, dataObject, fetchTableFuncArray };
+  return { queryObject, activeTab, dataObject, loadingStatus, errorStatus, fetchTableFuncArray };
 }

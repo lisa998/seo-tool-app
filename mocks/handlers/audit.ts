@@ -81,7 +81,7 @@ export const auditHandlers = [
           controller.enqueue(encoder.encode(progressEvent));
 
           // 隨機 issue_found 事件
-          if (Math.random() < 0.3) {
+          if (Math.random() < 0.5) {
             eventId++;
             const issueEvent =
               `id: ${eventId}\n` +

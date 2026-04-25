@@ -323,9 +323,28 @@ export function getAuditIssues(): AuditIssue[] {
 export function getUrlTree(): Map<string, UrlTreeNode[]> {
   if (!_urlTree) {
     faker.seed(600);
-    _urlTree = new Map();
+    const tree = new Map<string, UrlTreeNode[]>();
+    _urlTree = tree;
     const segments = ['blog', 'products', 'docs', 'about', 'pricing', 'tools', 'resources'];
-    _urlTree.set(
+    const createNode = (
+      segment: string,
+      fullPath: string,
+      type: UrlTreeNode['type'],
+      hasChildren: boolean,
+      pageCountRange: { min: number; max: number },
+      errorCountRange: { min: number; max: number },
+      warningCountRange: { min: number; max: number },
+    ): UrlTreeNode => ({
+      segment,
+      fullPath,
+      type,
+      pageCount: faker.number.int(pageCountRange),
+      errorCount: faker.number.int(errorCountRange),
+      warningCount: faker.number.int(warningCountRange),
+      hasChildren,
+    });
+
+    tree.set(
       '/',
       segments.map((seg) => ({
         segment: seg,
@@ -340,21 +359,46 @@ export function getUrlTree(): Map<string, UrlTreeNode[]> {
     // 為每個一級目錄建立子節點
     for (const seg of segments) {
       const childCount = faker.number.int({ min: 2, max: 8 });
-      _urlTree.set(
-        `/${seg}/`,
-        Array.from({ length: childCount }, () => {
-          const child = faker.lorem.slug({ min: 1, max: 2 });
-          return {
-            segment: child,
-            fullPath: `/${seg}/${child}/`,
-            type: faker.helpers.arrayElement(['directory', 'page']) as 'directory' | 'page',
-            pageCount: faker.number.int({ min: 1, max: 200 }),
-            errorCount: faker.number.int({ min: 0, max: 5 }),
-            warningCount: faker.number.int({ min: 0, max: 15 }),
-            hasChildren: faker.datatype.boolean(),
-          };
-        }),
-      );
+      const childNodes = Array.from({ length: childCount }, () => {
+        const child = faker.lorem.slug({ min: 1, max: 2 });
+        const fullPath = `/${seg}/${child}/`;
+        const hasChildren = faker.datatype.boolean();
+
+        if (hasChildren) {
+          const grandChildCount = faker.number.int({ min: 1, max: 5 });
+          tree.set(
+            fullPath,
+            Array.from({ length: grandChildCount }, () => {
+              const grandChild = faker.lorem.slug({ min: 1, max: 2 });
+              const grandChildPath = `${fullPath}${grandChild}/`;
+              return createNode(
+                grandChild,
+                grandChildPath,
+                'page',
+                false,
+                { min: 1, max: 50 },
+                { min: 0, max: 3 },
+                {
+                  min: 0,
+                  max: 10,
+                },
+              );
+            }),
+          );
+        }
+
+        return createNode(
+          child,
+          fullPath,
+          hasChildren ? 'directory' : 'page',
+          hasChildren,
+          { min: 1, max: 200 },
+          { min: 0, max: 5 },
+          { min: 0, max: 15 },
+        );
+      });
+
+      tree.set(`/${seg}/`, childNodes);
     }
   }
   return _urlTree;

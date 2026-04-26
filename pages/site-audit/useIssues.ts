@@ -1,6 +1,6 @@
-import { computed, Ref, ref, useContext } from '@nuxtjs/composition-api';
-import withLoading from '~/utils/withLoading';
+import { computed, Ref, useContext } from '@nuxtjs/composition-api';
 import { issueTagMap } from '~/pages/site-audit/constants';
+import useRequestState from '~/composables/useRequestState';
 
 export interface AuditIssue {
   id: string;
@@ -33,24 +33,23 @@ export default function (
   activeSeverity: Ref<string>,
   isRunnerCompleted: Ref<boolean>,
 ) {
-  const allIssues = ref<IssueResp>({} as IssueResp);
-  const issuesLoading = ref(false);
-  const issuesError = ref(null);
-
   const { $axios } = useContext();
 
+  const {
+    loading: issuesLoading,
+    error: issuesError,
+    data: allIssues,
+    execute,
+  } = useRequestState<IssueResp>({} as IssueResp);
+
   const fetchIssues = () =>
-    withLoading(
-      issuesLoading,
-      async () => {
-        allIssues.value = await $axios.$get(`/api/audit/issues/${auditId.value}`, {
-          params: {
-            category: activeCategory.value,
-            severity: activeSeverity.value,
-          },
-        });
-      },
-      issuesError,
+    execute(() =>
+      $axios.$get(`/api/audit/issues/${auditId.value}`, {
+        params: {
+          category: activeCategory.value,
+          severity: activeSeverity.value,
+        },
+      }),
     );
 
   const completedIssueRows = computed<IssueRow[]>(() =>

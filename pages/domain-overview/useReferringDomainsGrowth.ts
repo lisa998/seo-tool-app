@@ -1,5 +1,5 @@
-import { computed, Ref, ref, useContext } from '@nuxtjs/composition-api';
-import withLoading from '~/utils/withLoading';
+import { computed, Ref, useContext } from '@nuxtjs/composition-api';
+import useRequestState from '~/composables/useRequestState';
 import { chartColors } from '~/components/chart/chartTheme';
 import { executeCache } from '~/composables/useCachedFetch';
 
@@ -22,32 +22,31 @@ interface Series {
 }
 
 export default function (targetDomain: Ref<string>, activeRange: Ref<string>) {
-  const referringDomainsGrowthLoading = ref(false);
-  const referringDomainsGrowthError = ref<unknown>(null);
-  const referringDomainsGrowthData = ref<ReferringDomainsGrowthResp | null>(null);
-
   const { $axios } = useContext();
+  const {
+    loading: referringDomainsGrowthLoading,
+    error: referringDomainsGrowthError,
+    data: referringDomainsGrowthData,
+    execute,
+  } = useRequestState<ReferringDomainsGrowthResp>();
 
-  const fetchReferringDomainsGrowth = () =>
-    withLoading(
-      referringDomainsGrowthLoading,
-      async () => {
-        if (!targetDomain?.value) return;
-        referringDomainsGrowthData.value = null;
+  const fetchReferringDomainsGrowth = () => {
+    if (!targetDomain?.value) return;
+    referringDomainsGrowthData.value = null;
 
-        referringDomainsGrowthData.value = await executeCache<ReferringDomainsGrowthResp>(
-          `${targetDomain.value}:${activeRange.value}:referringDomainsGrowth`,
-          () =>
-            $axios.$get<ReferringDomainsGrowthResp>(`/api/domain-overview/referring-domains-growth`, {
-              params: {
-                domain: targetDomain.value,
-                range: activeRange.value,
-              },
-            }),
-        );
-      },
-      referringDomainsGrowthError,
+    return execute(() =>
+      executeCache<ReferringDomainsGrowthResp>(
+        `${targetDomain.value}:${activeRange.value}:referringDomainsGrowth`,
+        () =>
+          $axios.$get<ReferringDomainsGrowthResp>(`/api/domain-overview/referring-domains-growth`, {
+            params: {
+              domain: targetDomain.value,
+              range: activeRange.value,
+            },
+          }),
+      ),
     );
+  };
 
   const referringDomainsGrowthChartData = computed(() => {
     const xAxisCategories = [] as string[];

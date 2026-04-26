@@ -1,5 +1,5 @@
-import { computed, Ref, ref, useContext } from '@nuxtjs/composition-api';
-import withLoading from '~/utils/withLoading';
+import { computed, Ref, useContext } from '@nuxtjs/composition-api';
+import useRequestState from '~/composables/useRequestState';
 
 interface TrafficByCountryItem {
   countryCode: string;
@@ -13,30 +13,26 @@ interface TrafficByCountryResp {
 }
 
 export default function (targetDomain: Ref<string>) {
-  const trafficByCountryLoading = ref(false);
-  const trafficByCountryError = ref<unknown>(null);
-  const trafficByCountryData = ref<TrafficByCountryResp | null>(null);
-
   const { $axios } = useContext();
+  const {
+    loading: trafficByCountryLoading,
+    error: trafficByCountryError,
+    data: trafficByCountryData,
+    execute,
+  } = useRequestState<TrafficByCountryResp>();
 
-  const fetchTrafficByCountry = () =>
-    withLoading(
-      trafficByCountryLoading,
-      async () => {
-        if (!targetDomain?.value) return;
-        trafficByCountryData.value = null;
+  const fetchTrafficByCountry = () => {
+    if (!targetDomain?.value) return;
+    trafficByCountryData.value = null;
 
-        trafficByCountryData.value = await $axios.$get<TrafficByCountryResp>(
-          `/api/domain-overview/traffic-by-country`,
-          {
-            params: {
-              domain: targetDomain.value,
-            },
-          },
-        );
-      },
-      trafficByCountryError,
+    return execute(() =>
+      $axios.$get<TrafficByCountryResp>(`/api/domain-overview/traffic-by-country`, {
+        params: {
+          domain: targetDomain.value,
+        },
+      }),
     );
+  };
 
   const trafficByCountryChartData = computed(() => {
     const countries = [...(trafficByCountryData.value?.countries ?? [])].sort((a, b) => b.traffic - a.traffic);

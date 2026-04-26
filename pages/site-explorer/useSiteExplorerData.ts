@@ -1,5 +1,5 @@
 import { Ref, ref, useContext } from '@nuxtjs/composition-api';
-import withLoading from '~/utils/withLoading';
+import useRequestState from '~/composables/useRequestState';
 
 const Metrics = ['domainRating', 'backlinks', 'referringDomains', 'organicTraffic'] as const;
 type MetricsData = Record<(typeof Metrics)[number], number>;
@@ -21,8 +21,6 @@ export default function (domain: Ref<string>) {
   const { $axios } = useContext();
 
   const overviewData = ref<OverviewItem[]>([]);
-  const overviewLoading = ref<boolean>(false);
-  const overviewError = ref<unknown>(null);
 
   const fetchOverview = async () => {
     if (!domain?.value) return;
@@ -66,7 +64,9 @@ export default function (domain: Ref<string>) {
     ];
   };
 
-  const fetchOverviewWithLoading = () => withLoading(overviewLoading, fetchOverview, overviewError);
+  const { loading: overviewLoading, error: overviewError, execute } = useRequestState();
+
+  const fetchOverviewWithLoading = () => execute(fetchOverview);
 
   return { fetchOverviewWithLoading, overviewData, overviewLoading, overviewError };
 }

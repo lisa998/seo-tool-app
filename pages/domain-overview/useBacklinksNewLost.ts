@@ -1,5 +1,5 @@
-import { computed, Ref, ref, useContext } from '@nuxtjs/composition-api';
-import withLoading from '~/utils/withLoading';
+import { computed, Ref, useContext } from '@nuxtjs/composition-api';
+import useRequestState from '~/composables/useRequestState';
 import { chartColors } from '~/components/chart/chartTheme';
 import { executeCache } from '~/composables/useCachedFetch';
 
@@ -14,32 +14,29 @@ interface BacklinksNewLostResp {
 }
 
 export default function (targetDomain: Ref<string>, activeRange: Ref<string>) {
-  const backlinksNewLostLoading = ref(false);
-  const backlinksNewLostError = ref<unknown>(null);
-  const backlinksNewLostData = ref<BacklinksNewLostResp | null>(null);
-
   const { $axios } = useContext();
+  const {
+    loading: backlinksNewLostLoading,
+    error: backlinksNewLostError,
+    data: backlinksNewLostData,
+    execute,
+  } = useRequestState<BacklinksNewLostResp>();
 
-  const fetchBacklinksNewLost = () =>
-    withLoading(
-      backlinksNewLostLoading,
-      async () => {
-        if (!targetDomain?.value) return;
-        backlinksNewLostData.value = null;
+  const fetchBacklinksNewLost = () => {
+    if (!targetDomain?.value) return;
+    backlinksNewLostData.value = null;
 
-        backlinksNewLostData.value = await executeCache(
-          `${targetDomain.value}:${activeRange.value}:backlinksNewLost`,
-          () =>
-            $axios.$get<BacklinksNewLostResp>(`/api/domain-overview/backlinks-new-lost`, {
-              params: {
-                domain: targetDomain.value,
-                range: activeRange.value,
-              },
-            }),
-        );
-      },
-      backlinksNewLostError,
+    return execute(() =>
+      executeCache<BacklinksNewLostResp>(`${targetDomain.value}:${activeRange.value}:backlinksNewLost`, () =>
+        $axios.$get<BacklinksNewLostResp>(`/api/domain-overview/backlinks-new-lost`, {
+          params: {
+            domain: targetDomain.value,
+            range: activeRange.value,
+          },
+        }),
+      ),
     );
+  };
 
   const backlinksNewLostChartData = computed(() => {
     const dataPoints = backlinksNewLostData.value?.dataPoints ?? [];

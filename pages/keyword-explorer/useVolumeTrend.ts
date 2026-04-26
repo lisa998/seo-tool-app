@@ -1,5 +1,5 @@
 import { computed, ref, useContext } from '@nuxtjs/composition-api';
-import withLoading from '~/utils/withLoading';
+import useRequestState from '~/composables/useRequestState';
 
 interface VolumeTrendItem {
   month: string;
@@ -14,24 +14,19 @@ export default function (search: { keyword: string }) {
   const { $axios } = useContext();
 
   const volumeTrendData = ref<VolumeTrendItem[]>([]);
-  const volumeTrendLoading = ref(false);
-  const volumeTrendError = ref<unknown>(null);
+  const { loading: volumeTrendLoading, error: volumeTrendError, execute } = useRequestState();
 
   const fetchVolumeTrend = () =>
-    withLoading(
-      volumeTrendLoading,
-      async () => {
-        if (!search.keyword) return;
-        volumeTrendData.value = [];
-        const { months } = await $axios.$get<VolumeTrendResp>('/api/keyword/volume-trend', {
-          params: {
-            keyword: search.keyword,
-          },
-        });
-        volumeTrendData.value = months;
-      },
-      volumeTrendError,
-    );
+    execute(async () => {
+      if (!search.keyword) return;
+      volumeTrendData.value = [];
+      const { months } = await $axios.$get<VolumeTrendResp>('/api/keyword/volume-trend', {
+        params: {
+          keyword: search.keyword,
+        },
+      });
+      volumeTrendData.value = months;
+    });
 
   const barData = computed(() => {
     if (volumeTrendData.value.length === 0) return { categories: [], data: [] };

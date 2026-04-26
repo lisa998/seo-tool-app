@@ -1,5 +1,5 @@
 import { computed, Ref, ref, useContext } from '@nuxtjs/composition-api';
-import withLoading from '~/utils/withLoading';
+import useRequestState from '~/composables/useRequestState';
 
 export interface UrlTreeNode {
   segment: string;
@@ -20,25 +20,20 @@ export type UrlNodeStatus = Record<string, boolean>;
 
 export default function (auditId: Ref<string>, isRunnerCompleted: Ref<boolean>) {
   const urlTree = ref<Record<string, UrlTreeNode[]>>({});
-  const urlTreeLoading = ref(false);
-  const urlTreeError = ref<unknown | null>(null);
 
   const { $axios } = useContext();
+  const { loading: urlTreeLoading, error: urlTreeError, execute } = useRequestState();
 
   const fetchUrlTree = (path = '/') =>
-    withLoading(
-      urlTreeLoading,
-      async () => {
-        const { path: currentPath, children } = await $axios.$get<UrlTreeResp>(`/api/audit/url-tree/${auditId.value}`, {
-          params: { path },
-        });
-        urlTree.value = {
-          ...urlTree.value,
-          [currentPath]: children,
-        };
-      },
-      urlTreeError,
-    );
+    execute(async () => {
+      const { path: currentPath, children } = await $axios.$get<UrlTreeResp>(`/api/audit/url-tree/${auditId.value}`, {
+        params: { path },
+      });
+      urlTree.value = {
+        ...urlTree.value,
+        [currentPath]: children,
+      };
+    });
 
   const expandedPaths = ref<UrlNodeStatus>({});
   const loadingPaths = ref<UrlNodeStatus>({});
@@ -56,7 +51,7 @@ export default function (auditId: Ref<string>, isRunnerCompleted: Ref<boolean>) 
       rootNodes.value.length === 0,
   );
 
-  const updateStatusMap = (target: typeof loadingPaths, path: string, value: boolean) => {
+  const updateStatusMap = (target: Ref<UrlNodeStatus>, path: string, value: boolean) => {
     target.value = {
       ...target.value,
       [path]: value,

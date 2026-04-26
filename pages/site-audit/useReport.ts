@@ -1,5 +1,5 @@
-import { ref, Ref, useContext } from '@nuxtjs/composition-api';
-import withLoading from '~/utils/withLoading';
+import { Ref, useContext } from '@nuxtjs/composition-api';
+import useRequestState from '~/composables/useRequestState';
 
 interface ReportResp {
   auditId: string;
@@ -22,18 +22,9 @@ interface ReportResp {
 export default function (auditId: Ref<string>) {
   const { $axios } = useContext();
 
-  const report = ref<ReportResp | null>(null);
-  const reportLoading = ref(false);
-  const reportError = ref<string | null>(null);
+  const { loading: reportLoading, error: reportError, data: report, execute } = useRequestState<ReportResp>(null);
 
-  const fetchReport = () =>
-    withLoading(
-      reportLoading,
-      async () => {
-        report.value = await $axios.$get(`/api/audit/report/${auditId.value}`);
-      },
-      reportError,
-    );
+  const fetchReport = () => execute(() => $axios.$get(`/api/audit/report/${auditId.value}`));
 
   return {
     report,

@@ -1,5 +1,5 @@
-import { computed, Ref, ref, useContext } from '@nuxtjs/composition-api';
-import withLoading from '~/utils/withLoading';
+import { computed, Ref, useContext } from '@nuxtjs/composition-api';
+import useRequestState from '~/composables/useRequestState';
 
 interface LinkTypeDistributionItem {
   type: string;
@@ -12,30 +12,26 @@ interface LinkTypeDistributionResp {
 }
 
 export default function (targetDomain: Ref<string>) {
-  const linkTypeDistributionLoading = ref(false);
-  const linkTypeDistributionError = ref<unknown>(null);
-  const linkTypeDistributionData = ref<LinkTypeDistributionResp | null>(null);
-
   const { $axios } = useContext();
+  const {
+    loading: linkTypeDistributionLoading,
+    error: linkTypeDistributionError,
+    data: linkTypeDistributionData,
+    execute,
+  } = useRequestState<LinkTypeDistributionResp>();
 
-  const fetchLinkTypeDistribution = () =>
-    withLoading(
-      linkTypeDistributionLoading,
-      async () => {
-        if (!targetDomain?.value) return;
-        linkTypeDistributionData.value = null;
+  const fetchLinkTypeDistribution = () => {
+    if (!targetDomain?.value) return;
+    linkTypeDistributionData.value = null;
 
-        linkTypeDistributionData.value = await $axios.$get<LinkTypeDistributionResp>(
-          `/api/domain-overview/link-type-distribution`,
-          {
-            params: {
-              domain: targetDomain.value,
-            },
-          },
-        );
-      },
-      linkTypeDistributionError,
+    return execute(() =>
+      $axios.$get<LinkTypeDistributionResp>(`/api/domain-overview/link-type-distribution`, {
+        params: {
+          domain: targetDomain.value,
+        },
+      }),
     );
+  };
 
   const linkTypeDistributionChartData = computed(() => ({
     data: (linkTypeDistributionData.value?.distribution ?? []).map(({ type, percentage }) => ({

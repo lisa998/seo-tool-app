@@ -1,5 +1,5 @@
-import { computed, Ref, ref, useContext } from '@nuxtjs/composition-api';
-import withLoading from '~/utils/withLoading';
+import { computed, Ref, useContext } from '@nuxtjs/composition-api';
+import useRequestState from '~/composables/useRequestState';
 import { executeCache } from '~/composables/useCachedFetch';
 
 interface TrafficTrendDataPoint {
@@ -21,32 +21,29 @@ interface Series {
 }
 
 export default function (targetDomain: Ref<string>, activeRange: Ref<string>) {
-  const trafficTrendLoading = ref(false);
-  const trafficTrendError = ref<unknown>(null);
-  const trafficTrendData = ref<TrafficTrendResp | null>(null);
-
   const { $axios } = useContext();
+  const {
+    loading: trafficTrendLoading,
+    error: trafficTrendError,
+    data: trafficTrendData,
+    execute,
+  } = useRequestState<TrafficTrendResp>();
 
-  const fetchTrafficTrend = () =>
-    withLoading(
-      trafficTrendLoading,
-      async () => {
-        if (!targetDomain?.value) return;
-        trafficTrendData.value = null;
+  const fetchTrafficTrend = () => {
+    if (!targetDomain?.value) return;
+    trafficTrendData.value = null;
 
-        trafficTrendData.value = await executeCache<TrafficTrendResp>(
-          `${targetDomain.value}:${activeRange.value}:trafficTrend`,
-          () =>
-            $axios.$get<TrafficTrendResp>(`/api/domain-overview/traffic-trend`, {
-              params: {
-                domain: targetDomain.value,
-                range: activeRange.value,
-              },
-            }),
-        );
-      },
-      trafficTrendError,
+    return execute(() =>
+      executeCache<TrafficTrendResp>(`${targetDomain.value}:${activeRange.value}:trafficTrend`, () =>
+        $axios.$get<TrafficTrendResp>(`/api/domain-overview/traffic-trend`, {
+          params: {
+            domain: targetDomain.value,
+            range: activeRange.value,
+          },
+        }),
+      ),
     );
+  };
   const trafficTrendChartData = computed(() => {
     const xAxisCategories = [] as string[];
     const series = [

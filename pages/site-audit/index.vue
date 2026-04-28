@@ -1,5 +1,21 @@
 <template>
   <div class="grid gap-6">
+    <div class="flex justify-between items-center">
+      <div class="text-text-secondary text-[14px]">網站健康檢查: example.com</div>
+      <div class="flex flex-col items-end gap-1">
+        <el-button
+          :disabled="!isRunnerCompleted || exportLoading"
+          :loading="exportLoading"
+          icon="el-icon-download"
+          size="small"
+          type="primary"
+          @click="fetchExport()"
+        >
+          匯出報告
+        </el-button>
+        <div v-if="exportError" class="text-danger text-[12px]">匯出失敗，請稍後再試</div>
+      </div>
+    </div>
     <common-card>
       <div class="flex justify-between items-center">
         <h3>爬取進度</h3>
@@ -145,6 +161,7 @@ import useIssues from '~/pages/site-audit/useIssues';
 import useUrlTree from '~/pages/site-audit/useUrlTree';
 import VirtualScroll from '~/components/common/VirtualScroll.vue';
 import SiteAuditUrlTreeBranch from '~/components/site-audit/UrlTreeBranch.vue';
+import useExport from '~/pages/site-audit/useExport';
 
 const {
   auditId,
@@ -227,6 +244,8 @@ const summary = computed(() => {
     },
   ];
 });
+
+const { exportLoading, exportError, fetchExport } = useExport(auditId);
 </script>
 <style lang="scss" scoped>
 ::v-deep(.health-score .el-progress--circle .el-progress__text) {

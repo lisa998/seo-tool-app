@@ -136,7 +136,7 @@ import useTopKeywords from '~/pages/domain-overview/useTopKeywords';
 import useLinkTypeDistribution from '~/pages/domain-overview/useLinkTypeDistribution';
 import useBacklinksNewLost from '~/pages/domain-overview/useBacklinksNewLost';
 import useLazyFetchOnVisible from '~/composables/useLazyFetchOnVisible';
-import { clearAllCache } from '~/composables/useCachedFetch';
+import { clearAllCache } from '~/utils/requestCache';
 
 const targetDomain = ref('');
 

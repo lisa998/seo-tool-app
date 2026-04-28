@@ -8,9 +8,9 @@ export const executeCache = async <T>(key: string, fetcher: () => Promise<T>, tt
     const result = await fetcher();
     cache.set(key, { data: result, timestamp: Date.now() });
     return result;
-  } else {
-    return cached.data as T;
   }
+
+  return cached.data as T;
 };
 
 export const clearAllCache = () => {

@@ -1,7 +1,7 @@
 import { computed, Ref, useContext } from '@nuxtjs/composition-api';
 import useRequestState from '~/composables/useRequestState';
 import { chartColors } from '~/components/chart/chartTheme';
-import { executeCache } from '~/composables/useCachedFetch';
+import { executeCache } from '~/utils/requestCache';
 
 interface BacklinksNewLostDataPoint {
   month: string;

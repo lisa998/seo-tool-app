@@ -1,6 +1,7 @@
 import { computed, Ref, useContext } from '@nuxtjs/composition-api';
 import { issueTagMap } from '~/pages/site-audit/constants';
 import useRequestState from '~/composables/useRequestState';
+import { executeCache } from '~/utils/requestCache';
 
 export interface AuditIssue {
   id: string;
@@ -44,12 +45,14 @@ export default function (
 
   const fetchIssues = () =>
     execute(() =>
-      $axios.$get(`/api/audit/issues/${auditId.value}`, {
-        params: {
-          category: activeCategory.value,
-          severity: activeSeverity.value,
-        },
-      }),
+      executeCache(`issue-${activeCategory.value}-${activeSeverity.value}`, () =>
+        $axios.$get(`/api/audit/issues/${auditId.value}`, {
+          params: {
+            category: activeCategory.value,
+            severity: activeSeverity.value,
+          },
+        }),
+      ),
     );
 
   const completedIssueRows = computed<IssueRow[]>(() =>

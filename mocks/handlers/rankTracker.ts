@@ -146,7 +146,7 @@ export const rankTrackerHandlers = [
           kw.position.current = faker.number.int({ min: 1, max: 100 });
           break;
       }
-      return { id, success: true };
+      return { id, success: true, kw };
     });
 
     return HttpResponse.json({
@@ -186,7 +186,7 @@ export const rankTrackerHandlers = [
       name: (body.name as string) ?? 'New Rule',
       condition: (body.condition as any) ?? { metric: 'position_drop', threshold: 5 },
       channels: (body.channels as string[]) ?? ['email'],
-      enabled: true,
+      enabled: body.enabled as boolean,
     };
     rules.push(newRule);
 

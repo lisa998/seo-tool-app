@@ -27,6 +27,7 @@
               :data="data?.sparklines"
               :title="data.title"
               class="item-center flex justify-center"
+              show-tooltip
             />
           </div>
         </common-card>
@@ -54,7 +55,7 @@
         </div>
         <table-skeleton v-if="loadingStatus[activeTab]" :grid-cols="gridTemplate" />
         <error-img v-else-if="errorStatus[activeTab]" class="h-[300px]" />
-        <not-search-yet v-else-if="dataObject[activeTab]?.data.length === 0" text="等待搜尋網址" class="h-[300px]" />
+        <not-search-yet v-else-if="dataObject[activeTab]?.data.length === 0" class="h-[300px]" text="等待搜尋網址" />
         <div v-else class="table-border">
           <virtual-scroll :items-length="dataObject[activeTab]?.data.length" :row-height="virtualScrollRowHeight">
             <template v-slot="{ startIndex, endIndex }">

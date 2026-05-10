@@ -56,6 +56,10 @@ const props = defineProps({
     type: String,
     default: '',
   },
+  showTooltip: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const lineShadow = {
@@ -84,7 +88,11 @@ const options = computed(() => {
       backgroundColor: 'transparent',
       margin: [0, 0, 0, 0],
     },
-
+    tooltip: {
+      enabled: props.showTooltip,
+      headerFormat: '',
+      pointFormat: '{series.name}: <b>{point.y}</b>',
+    },
     series: [
       {
         type: 'line',

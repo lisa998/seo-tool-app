@@ -26,7 +26,7 @@ const config: NuxtConfig = {
     baseURL: 'http://localhost:3000',
   },
   buildModules: ['@nuxt/typescript-build', '@nuxtjs/composition-api/module', '@nuxtjs/tailwindcss'],
-  css: ['~/assets/styles/element-variables.scss', '~/assets/styles/tailwind.css', '~/assets/styles/global.css'],
+  css: ['~/assets/styles/element-variables.scss', '~/assets/styles/tailwind.css', '~/assets/styles/global.scss'],
   plugins: [
     '~/plugins/axios',
     '~/plugins/element-ui.ts',
@@ -34,6 +34,11 @@ const config: NuxtConfig = {
     { src: '~/plugins/msw.client.ts', mode: 'client' },
   ],
   components: true,
+  vue: {
+    config: {
+      devtools: true,
+    },
+  },
   build: {
     loaders: {
       scss: {

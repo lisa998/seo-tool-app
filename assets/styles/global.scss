@@ -1,0 +1,39 @@
+.table-border {
+    border: 1px solid #ab9b93;
+    border-radius: 0.5rem;
+    overflow-y: hidden;
+    overflow-x: scroll;
+}
+
+// Fix tooltip arrow color when using custom bg on popper-class
+@mixin tooltip-arrow-color($color) {
+    .popper__arrow,
+    .popper__arrow::after {
+        border-top-color: $color !important;
+    }
+
+    &[x-placement^="bottom"] {
+        .popper__arrow,
+        .popper__arrow::after {
+            border-bottom-color: $color !important;
+        }
+    }
+
+    &[x-placement^="left"] {
+        .popper__arrow,
+        .popper__arrow::after {
+            border-left-color: $color !important;
+        }
+    }
+
+    &[x-placement^="right"] {
+        .popper__arrow,
+        .popper__arrow::after {
+            border-right-color: $color !important;
+        }
+    }
+}
+
+.\!bg-primary.el-tooltip__popper         { @include tooltip-arrow-color(#a48677); }
+.\!bg-primary-hover.el-tooltip__popper   { @include tooltip-arrow-color(#8f6e61); }
+.\!bg-primary-active.el-tooltip__popper  { @include tooltip-arrow-color(#6f5c54); }

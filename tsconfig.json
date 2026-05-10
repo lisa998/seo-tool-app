@@ -29,6 +29,11 @@
     ],
     "allowSyntheticDefaultImports": true
   },
+  "include": [
+    "**/*.ts",
+    "**/*.vue",
+    "shims-vue.d.ts"
+  ],
   "exclude": [
     "node_modules"
   ]

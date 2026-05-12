@@ -140,7 +140,7 @@
                 @keyup.enter.native="onEditTag"
               />
             </div>
-            <span v-if="editTagWaring" class="text-danger text-xs">請勾選關鍵字，輸入Tag名稱</span>
+            <span v-if="editTagWarning" class="text-danger text-xs">請勾選關鍵字，輸入Tag名稱</span>
             <el-button size="small" type="primary" @click="onEditTag">送出</el-button>
           </div>
           <el-button slot="reference" size="small" type="primary">管理標籖</el-button>
@@ -288,7 +288,6 @@ import NotificationRulesForm from '~/components/rank-tracker/NotificationRulesFo
 import useKeywordFilter from '~/pages/rank-tracker/useKeywordFilter';
 import useKeywordSelection from '~/pages/rank-tracker/useKeywordSelection';
 import useKeywordTable from '~/pages/rank-tracker/useKeywordTable';
-import { ruleToPayloadMapper } from '~/mappers/rank-tracker/rules.mapper';
 import useKeywordBatch from '~/pages/rank-tracker/useKeywordBatch';
 import LoadingSquare from '~/components/common/LoadingSquare.vue';
 
@@ -296,8 +295,13 @@ const activeTab = ref<RankTrackerKeywordsTab>('all');
 const cursor = ref<string | null>(null);
 const { searchKeyword, activeSearch, activeTag, sort, limit } = useKeywordFilter();
 
-const { keywords, fetchKeywords, keywordsLoading, keywordsError, summaryCard, loadMore } =
-  useKeywords(activeTab, cursor, limit, activeTag, sort);
+const { keywords, fetchKeywords, keywordsLoading, keywordsError, summaryCard, loadMore } = useKeywords(
+  activeTab,
+  cursor,
+  limit,
+  activeTag,
+  sort,
+);
 const { virtualTable, keywordsLength } = useKeywordTable(keywords, activeSearch);
 const { fetchDistribution, distributionLoading, distributionError, distributionChartData } = useDistribution();
 const { tags, fetchTags, tagsLoading, tagsError } = useTags();
@@ -312,7 +316,7 @@ const {
 const { selectKeywordIds, checkedAll, isKeywordSelected, toggleSelect, cancelCheckedAll } =
   useKeywordSelection(keywords);
 
-const { onKeywordBatch, onEditTag, operateTag, operateAction, editTagWaring, batchFailedIds } = useKeywordBatch(
+const { onKeywordBatch, onEditTag, operateTag, operateAction, editTagWarning, batchFailedIds } = useKeywordBatch(
   selectKeywordIds,
   keywords,
 );
@@ -323,7 +327,7 @@ onMounted(() => {
 
 const notiDialogVisible = ref(false);
 const addNewRules = (form: NotificationRulesFormType) => {
-  createNotificationRule(ruleToPayloadMapper(form));
+  createNotificationRule(form);
   notiDialogVisible.value = false;
 };
 </script>

@@ -5,9 +5,10 @@ import { Context } from '@nuxt/types';
 export default function ({ $axios }: Context) {
   $axios.onError((error: AxiosError) => {
     if (process.client) {
+      const config = error.config || {};
       Notification.error({
-        title: '請求失敗',
-        message: error.response?.data?.message || error.message || '未知錯誤',
+        title: config.errorTitle || '請求失敗',
+        message: config.errorMessage || error.response?.data?.message || error.message || '未知錯誤',
       });
     }
   });

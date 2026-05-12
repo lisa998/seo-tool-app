@@ -89,21 +89,11 @@ interface RankTrackerNotificationCondition {
 }
 
 export interface RankTrackerNotificationRule {
-  id: string;
+  id?: string;
   name: string;
   condition: RankTrackerNotificationCondition;
   channels: string[];
   enabled: boolean;
-}
-
-export interface RankTrackerNotificationRulesResponse {
-  rules: RankTrackerNotificationRule[];
-}
-
-export interface CreateRankTrackerNotificationRulePayload {
-  name?: string;
-  condition?: RankTrackerNotificationCondition;
-  channels?: string[];
 }
 
 const TagAction = ['addTag', 'removeTag'] as const;

@@ -114,7 +114,7 @@ export const rankTrackerHandlers = [
     await delay(400); // 刻意慢一些，讓前端有時間展示 optimistic UI
 
     // 🎯 5% 機率失敗 → 測試 rollback
-    const err = maybeError(0.05);
+    const err = maybeError(0.5);
     if (err) return err;
 
     const body = (await request.json()) as {
@@ -190,6 +190,8 @@ export const rankTrackerHandlers = [
     };
     rules.push(newRule);
 
+    const err = maybeError(0.5);
+    if (err) return err;
     return HttpResponse.json(newRule, { status: 201 });
   }),
 ];

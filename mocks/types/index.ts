@@ -1,4 +1,4 @@
-// mocks/types/index.ts
+// mocks/types.d.ts/index.ts
 // 所有 API 共用的 TypeScript 型別定義
 
 // ============================================================

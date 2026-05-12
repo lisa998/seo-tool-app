@@ -9,6 +9,7 @@ import {
 } from '~/mappers/site-explorer/referringDomains.mapper';
 import { AnchorsApiDto, anchorsMapper, AnchorsViewModel } from '~/mappers/site-explorer/anchors.mapper';
 import { BrokenLinksApiDto, brokenLinksMapper, BrokenLinksViewModel } from '~/mappers/site-explorer/brokenLinks';
+import { executeCache } from '~/utils/requestCache';
 
 const linkAnalysisKeys = ['backlinks', 'referring-domains', 'anchors', 'broken-links'] as const;
 
@@ -101,9 +102,11 @@ export default function (domain: Ref<string>) {
           });
           if (!domain?.value) return;
           dataObject[key] = { data: [], pagination: {} };
-          const { data, pagination } = await $axios.$get<ApiResp<K>>(`/api/site-explorer/${key}`, {
-            params: { domain: domain.value, ...queryParams },
-          });
+          const { data, pagination } = await executeCache(`${key}-${domain.value}-${JSON.stringify(queryParams)}`, () =>
+            $axios.$get<ApiResp<K>>(`/api/site-explorer/${key}`, {
+              params: { domain: domain.value, ...queryParams },
+            }),
+          );
           dataObject[key] = {
             data: data.map((d) => mapper[key](d)),
             pagination,
